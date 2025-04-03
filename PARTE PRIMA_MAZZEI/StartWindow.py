@@ -1,7 +1,7 @@
 import tkinter as tk
 import pygame as py
 from PIL import Image, ImageTk 
-import ControllerHome as ch
+import ControllerGame as cg
 #import WindowsGame as wg
 
 
@@ -11,9 +11,9 @@ def init_gui():
 
   # finestra principale
   windows_root=tk.Tk()
-  window_height = 700
+  window_height = 750
   window_width = 1200
-  windows_root.title("Tomb Raider")
+  windows_root.title("Tomb Raider Challenge")
   windows_root.configure(bg='black')
   windows_root.resizable(False,False)
   screen_width = windows_root.winfo_screenwidth()
@@ -34,16 +34,18 @@ def init_gui():
   bg_label.pack(pady= 50, side=tk.TOP)
   bg_label.image = image
 
+  # Creazione di un frame contenitore per i pulsanti
+  frame = tk.Frame(windows_root, background="black")
+  frame.pack(pady=50,side=tk.BOTTOM )  # Posizioniamo il frame a metà altezza
 
-  start_button=tk.Button(windows_root, text="Nuovo Quiz",background="grey", fg="white", font="Helvetica 14 bold",  height=2, width=10)
-  start_button.place(x=30,y=170)
-  quit_button=tk.Button(windows_root, text="Esci",background="grey", fg="white", font="Helvetica 14 bold", height=2, width=10)
-  quit_button.place(x=30, y=270)
+  start_button=tk.Button(frame, text="Nuovo Quiz",background="grey", fg="white", font="Helvetica 14 bold",  height=2, width=10, command= lambda: cg.init_window_game(windows_root))
+  start_button.pack(padx=20, side=tk.LEFT)
 
+  quit_button=tk.Button(frame, text="Esci",background="grey", fg="white", font="Helvetica 14 bold", height=2, width=10, command= lambda : cg.exitApplication(windows_root))
+  quit_button.pack(padx=20, side=tk.LEFT)
 
-  
-  credits_button=tk.Button(windows_root, text="@Credits", background="grey", fg="white", font="Helvetica 14 bold", height=2, width=10)
-  credits_button.pack(padx=100, pady=70, side=tk.BOTTOM)
+  credits_button=tk.Button(frame, text="@Credits", background="grey", fg="white", font="Helvetica 14 bold", height=2, width=10, command=cg.print_credit)
+  credits_button.pack(padx=20, side=tk.LEFT)
 
   windows_root.mainloop()
 

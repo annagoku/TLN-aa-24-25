@@ -1,13 +1,16 @@
 import tkinter as tk
 import pygame as py
 from PIL import Image, ImageTk 
-import ControllerHome as ch
+import ControllerGame as cg
 import StartWindow as sw
+from ChatBotGui import ChatBotGui
+import simpleNLG as sp
 
-
-def main():
-  sw.init_gui()
-    
 
 if __name__ == "__main__":
-    main()
+    app = ChatBotGui()
+    app.run()
+    
+
+    
+
