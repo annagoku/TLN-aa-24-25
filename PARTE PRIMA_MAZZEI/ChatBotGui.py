@@ -6,7 +6,6 @@ import ControllerGame as cg
 import tkinter.messagebox
 import numpy as ny
 import simpleNLG as sp
-import time
 import Utility as u
 import Logic as l
 import config as glvar
