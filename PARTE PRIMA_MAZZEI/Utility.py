@@ -10,18 +10,38 @@ import time
 import spacy
 from spacy import displacy
 from pathlib import Path
+import config as glvar
+import Logic as l
 
 
 nlp=spacy.load("en_core_web_sm")
 
 
 
-def simulate_typing(widget, message, index=0, delay=50):
+def simulate_typing(widget, message, index=0, delay=50, submit_button=None, user_input=None):
     """ Effetto di scrittura lettera per lettera su un widget di Tkinter. """
+    if index == 0:
+      glvar.is_typing= True
+      if submit_button:
+         submit_button.config(state='disabled')
+      if user_input:
+         user_input.delete(0, 'end')
+         user_input.config(state='disabled')
     if index < len(message):
         widget.insert(tk.END, message[index])
         widget.yview(tk.END)  # Scorri fino in fondo
-        widget.after(delay, simulate_typing, widget, message, index + 1, delay)
+        widget.after(delay, simulate_typing, widget, message, index + 1, delay, submit_button, user_input)
+    else:
+        glvar.is_typing=False
+        if submit_button:
+           submit_button.config(state='normal')
+        if user_input:
+           user_input.config(state='normal')
+           
+        if glvar.pending_message is not None:
+            l.mng_dialog(glvar.pending_message, glvar.pending_chat_history, submit_button=submit_button, user_input=user_input)
+            glvar.pending_message = None
+            glvar.pending_chat_history = None
 
 
 def parser_nen(frase):
@@ -58,7 +78,7 @@ def displayParser(frase):
 
 
 #Funzione di parser parametrica per gestire le risposte che contengono una lista di oggetti 
-def exstract_listed_words(user_message, key_word):
+def exstract_listed_words(user_message, correct_answer, key_word):
     """
     Estrae parole chiave (nomi) da una frase usando spaCy,
     evitando termini generici definiti dall'utente e privilegiando i sostantivi specifici.
@@ -71,11 +91,12 @@ def exstract_listed_words(user_message, key_word):
     
     # Converti parole generiche in un set per efficienza
     key_word_set = set(key_word)
+    correct_answer_set=set(correct_answer)
     
     # Estrai i nomi (sostantivi) specifici
     # Estrai sostantivi comuni (NOUN) e nomi propri (PROPN)
-    word_listed = [token.text.strip() for token in doc if token.pos_ in {"NOUN", "PROPN"} and token.lemma_ not in key_word_set]
-    
+    word_listed = [token.text.strip() for token in doc if token.pos_ in {"NOUN", "PROPN"} and token.lemma_ not in correct_answer_set]
+    print(word_listed)
     # Se la frase contiene "and" o ",", dare priorità alle parole attorno a queste congiunzioni
     word_filtered = []
     for i, token in enumerate(doc):
@@ -84,5 +105,44 @@ def exstract_listed_words(user_message, key_word):
                 word_filtered.append(doc[i - 1].text.strip())
             if doc[i + 1].pos_ in {"NOUN", "PROPN"} and doc[i + 1].lemma_ not in key_word_set:
                 word_filtered.append(doc[i + 1].text.strip())
+
+     # Se word_listed contiene parole NON presenti tra le keyword, restituisci []
+    if any(w.lower() not in key_word_set for w in word_listed):
+        return []
+
+    # Altrimenti, restituisci i filtrati (o vuoto se non ce ne sono)
+    return word_filtered  
+
+
+
+def check_answer_no_list(user_message, correct_answer, key_word):
+    doc_user_message = nlp(user_message.lower())
+    doc_correct_answer = nlp(correct_answer.lower())
     
-    return word_filtered if word_filtered else word_listed
+    word_user = set()
+    for token in doc_user_message:
+        if token.pos_ in {"NOUN", "PROPN", "NUM"}:
+            word_user.add(token.lemma_)
+            word_user.add(token.text)
+            word_user.add(token.text.lower())
+
+    print("Parole utente:", word_user)
+
+    word_correct_answer = set([
+        token.lemma_ for token in doc_correct_answer 
+        if not token.is_punct and not token.is_stop
+    ])
+    print("Risposta corretta (lemmi):", word_correct_answer)
+    word_keyword = set(key_word)
+    print("Parole key:", word_keyword)
+
+    # Caso 1: risposta esatta + alcune keyword
+    if word_correct_answer.issubset(word_user) and word_user.intersection(word_keyword):
+        return True
+
+    # Caso 2: solo risposta esatta
+    if word_correct_answer == word_user:
+        return True
+
+    # Altrimenti, è errata
+    return False

@@ -53,19 +53,31 @@ class ChatBotGui:
     input_frame.pack(side="left", padx=0, pady=50)  # Posizioniamo il frame a destra
     input_frame.pack_propagate(False)  # Blocca il ridimensionamento automatico
 
-  # Label per il nome (posizionata a sinistra)
+    #Campo di chat
     self.chat_history = scrolledtext.ScrolledText(input_frame, wrap=tk.WORD, width=60, height=20, state='normal')
     self.chat_history.grid(row=0, column=0, padx=10, pady=20, sticky="e")  # Allineata a destra
 
-  # Campo di testo (posizionato a destra della label)
+  # Campo per inserimento di testo 
     self.user_input = tk.Entry(input_frame, width=60)
     self.user_input.grid(row=1, column=0,padx=10, pady=5)
 
   # Pulsante di invio (posizionato sotto)
-    self.submit_button = tk.Button(input_frame, font="Helvetica 14 bold", bg="grey", fg="white", text=glvar.text_button, command=self.mng_user_input)
-    self.submit_button.grid(row=2, column=1, padx=5, sticky="e")
+    self.submit_button = tk.Button(input_frame, font="Helvetica 14 bold", bg="grey", fg="white", width=10, text=glvar.text_button, command=self.mng_user_input)
+    self.submit_button.grid(row=3, column=1, padx=(0, 5), sticky="e")
 
     self.window_game.after(1000, self.displayFirst_message)
+  
+  # Pulsante di uscita (inizialmente nascosto)
+    self.exit_button = tk.Button(input_frame, text="Exit", font="Helvetica 14 bold", bg="grey", fg="white", width=10, command=self.window_game.destroy)
+    self.exit_button.grid(row=2, column=1, padx=(0, 5), pady=(0, 30), sticky="n")
+    self.exit_button.grid_remove()
+    #self.exit_button.grid()
+
+  # Pulsante di riavvio (inizialmente nascosto)
+    self.restart_button = tk.Button(input_frame, text="Restart", font="Helvetica 14 bold", bg="grey", fg="white", width=10, command=self.restart_game)
+    self.restart_button.grid(row=1, column=1, padx=(0, 5), pady=(0, 30), sticky="n")
+    self.restart_button.grid_remove()
+    #self.restart_button.grid()
 
 
   def change_text(self):
@@ -77,20 +89,32 @@ class ChatBotGui:
   
   def displayFirst_message(self):
       self.phrase=sp.build_phrase_complete("I", "be", "Lara Croft")
-      u.simulate_typing(self.chat_history, "Lara: "+ "Hi! " + self.phrase + "\n")
+      u.simulate_typing(self.chat_history, "Lara: "+ "Hi! " + self.phrase + "\n", submit_button=self.submit_button, user_input=self.user_input)
 
   def mng_user_input(self):
       user_message = self.user_input.get().strip()
       if user_message!='' and glvar.state_dialog>=0:
-         u.simulate_typing(self.chat_history, "Player: "+ user_message + "\n")
-         self.user_input.delete(0, 'end')
+         u.simulate_typing(self.chat_history, "Player: "+ user_message + "\n", submit_button=self.submit_button, user_input=self.user_input)
          print(user_message)
          self.chat_history.after(2000, lambda: self.process_bot_response(user_message))  
       else: 
          self.change_text()
-         l.mng_dialog(user_message, self.chat_history)  # Ottieni la risposta
+         l.mng_dialog(user_message, self.chat_history, submit_button=self.submit_button, user_input=self.user_input)  # Ottieni la risposta
       
      
   def process_bot_response(self, user_message):
-      l.mng_dialog(user_message, self.chat_history)  # Ottieni la risposta
-    
+      l.mng_dialog(user_message, self.chat_history, submit_button=self.submit_button, user_input=self.user_input)  # Ottieni la risposta
+  
+  def show_end_buttons(self):
+    self.exit_button.grid()
+    self.restart_button.grid()
+
+  def restart_game(self):
+    # Reset eventuali variabili globali
+    #glvar.reset()  # Solo se hai una funzione per resettare
+    self.chat_history.delete('1.0', tk.END)
+    self.user_input.config(state='normal')
+    self.submit_button.config(state='normal')
+    self.exit_button.grid_remove()
+    self.restart_button.grid_remove()
+    self.displayFirst_message()
