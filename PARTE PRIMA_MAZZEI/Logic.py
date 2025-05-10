@@ -24,7 +24,7 @@ key_word=""
 text=""
 param=""
 num_question=0
-
+#glvar.is_start_game=False
 nlp=spacy.load("en_core_web_sm")
 
 
@@ -41,30 +41,27 @@ def mng_dialog(user_message, chat_history, submit_button, user_input):
         Lara_response=sp.ask_info("name")
         glvar.started=True
         glvar.state_dialog=0
-        u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", submit_button=submit_button, user_input=user_input)
+        u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", tag="lara", submit_button=submit_button, user_input=user_input)
     elif glvar.state_dialog==0:
          name=u.parser_nen(user_message) #attenzione alla maiusola
          print(name)
          if name is None or name=='':
            Lara_response=sp.no_answer("your", "name")
-           u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", submit_button=submit_button, user_input=user_input)
+           u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", tag="lara", submit_button=submit_button, user_input=user_input)
          else:
             glvar.player_name=name
             d.save_name(glvar.player_name)
             glvar.state_dialog=1
             temp=sp.verb_subj("study", "you")
             Lara_response=" Hi! "+ name + ". Let's start! " + temp
-            u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", submit_button=submit_button, user_input=user_input)
+            u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", tag="lara", submit_button=submit_button, user_input=user_input)
     elif glvar.state_dialog==1 and num_question==0:           
             if 'not' in user_message.lower() or '\'t' in user_message.lower() or 'no' in user_message.lower():
                 Lara_response="You're not brave enough for this challenge. See you next time"
-                u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", submit_button=submit_button, user_input=user_input)
-
-                glvar.gui.show_end_buttons()
-
-                #to do come interrompere il gioco es. disabilitare chat e invio
-
+                glvar.end_game=True #Interruzione del gioco e disabilitazione elementi di interfaccia in simulate typing
+                u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", tag="lara", submit_button=submit_button, user_input=user_input)
                 
+
             elif 'yes' in user_message.lower() or 'of course' in user_message.lower() or 'i have studied' in user_message.lower():
                 extracted_number=extract_question()
                 d.save_question_made_for_player(extracted_number)
@@ -72,18 +69,19 @@ def mng_dialog(user_message, chat_history, submit_button, user_input):
                 num_question=num_question+1
                 print("Domanda "+ str(num_question))
                 Lara_response="Well, we'll start then! " + sp.start_exam() + " The "+ num2words(num_question, to='ordinal')+" question is: " + text
-                u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", submit_button=submit_button, user_input=user_input)                
+                u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", tag="lara", submit_button=submit_button, user_input=user_input)                
             else: 
                Lara_response="Please, let me know if you have studied. Don't make me waste time!"
-               u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", submit_button=submit_button, user_input=user_input) 
+               u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", tag="lara", submit_button=submit_button, user_input=user_input) 
 
     elif (glvar.state_dialog==1 and num_question==1) or glvar.state_dialog==2  or glvar.state_dialog==3:
         if user_message is None or user_message=='':
             Lara_response="Please give me an answer right or wrong.Try!"
-            u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", submit_button=submit_button, user_input=user_input)
+            u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", tag="lara", submit_button=submit_button, user_input=user_input)
         else:
             
           d.save_answer_player(user_message, num_question)
+          d.save_correct_answer_for_player(correct_answer, num_question)
           answer=mng_question(user_message, type, correct_answer, key_word)
           if answer:
             glvar.punteggio=glvar.punteggio+10
@@ -100,7 +98,7 @@ def mng_dialog(user_message, chat_history, submit_button, user_input):
             print("Domanda"+ str(num_question))
             extracted_number=extract_question()       
             d.save_question_made_for_player(extracted_number)
-            u.simulate_typing(chat_history, "Lara: "+ Lara_response + " "+ "Go on with the "+ num2words(num_question, to='ordinal')+" question. " + text +"\n", submit_button=submit_button, user_input=user_input)
+            u.simulate_typing(chat_history, "Lara: "+ Lara_response + " "+ "Go on with the "+ num2words(num_question, to='ordinal')+" question. " + text +"\n", tag="lara", submit_button=submit_button, user_input=user_input)
       
           elif glvar.state_dialog==3:
               if glvar.punteggio<=10:
@@ -109,7 +107,8 @@ def mng_dialog(user_message, chat_history, submit_button, user_input):
                   End_game=str(glvar.punteggio) +" points. "+"Good but not the best! My adventures are still too dangerous for you. "
               elif glvar.punteggio==30:
                   End_game=str(glvar.punteggio)+" points. "+"Well done! You are ready to take part to my next mission. "
-              u.simulate_typing(chat_history, "Lara: "+ Lara_response + " "+"\n" + "Lara: "+ End_game, submit_button=submit_button, user_input=user_input)
+              glvar.end_game=True #Interruzione del gioco e disabilitazione elementi di interfaccia in simulate typing    
+              u.simulate_typing(chat_history, "Lara: "+ Lara_response + " "+"\n" + "Lara: "+ End_game, tag="lara", submit_button=submit_button, user_input=user_input)
 
 
 
@@ -130,7 +129,7 @@ def mng_question(user_message,type, correct_answer, key_word):
 #Integra il controllo di correttezza con funzione di parsing per evitare risposte sematicamente scorrette
 def mng_question_binary(user_message, correct_answer):
     if 'yes' in user_message.lower() or 'of course' in user_message.lower() or 'true' in user_message.lower() and correct_answer:
-        answer=u.check_answer_no_list(user_message, correct_answer, key_word)
+        answer=u.check_answer_no_list(user_message, correct_answer, key_word, type)
     else:
         answer=False
     return answer
@@ -141,14 +140,14 @@ def mng_question_year(user_message, correct_answer):
        or num2words(int(correct_answer), lang='en') in user_message.lower() 
        or num2words(int(correct_answer[2:4])) in user_message.lower()
       ):
-        answer=u.check_answer_no_list(user_message, correct_answer, key_word)
+        answer=u.check_answer_no_list(user_message, correct_answer, key_word, type)
     else:
         answer=False
     return answer
 
 def mng_question_number(user_message, correct_answer):
     if (correct_answer in user_message.lower() or num2words(int(correct_answer), lang='en') in user_message.lower()):
-        answer=u.check_answer_no_list(user_message, correct_answer, key_word)
+        answer=u.check_answer_no_list(user_message, correct_answer, key_word, type)
     else:
         answer=False
     return answer
@@ -157,7 +156,7 @@ def mng_question_properName(user_message,correct_answer):
     name=u.parser_proper_name(user_message)
     print(name)
     if correct_answer in name:
-        answer=u.check_answer_no_list(user_message, correct_answer, key_word)
+        answer=u.check_answer_no_list(user_message, correct_answer, key_word, type)
     else:
         answer=False
     return answer

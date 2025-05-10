@@ -9,9 +9,10 @@ import config as glvar
 
 
 if __name__ == "__main__":
-    app = ChatBotGui()
-    glvar.gui=app
-    app.run()
+  sw.init_gui()
+    #app = ChatBotGui()
+    #glvar.gui=app
+    #app.run()
     
 
   
