@@ -11,7 +11,7 @@ nltk.download('punkt_tab')
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-NUM_QUERY=5
+NUM_QUERY=10
 TOP_N=5
 
 if __name__ == "__main__":
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     #estrae dagli elementi campionati solo la headline e crea un lista
     sampled_sentece=df_sampled['headline'].tolist() 
 
-    #pipeline
+    #pipelines
     vectorizer = TfidfVectorizer(lowercase=False, stop_words=None)
     pre_processed_sentence=[u.extraction_lemmi_from_sentence(s) for s in sampled_sentece ]
     '''

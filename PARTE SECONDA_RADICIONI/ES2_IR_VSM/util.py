@@ -7,6 +7,7 @@ import re
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 
 console = Console()
 
@@ -47,11 +48,14 @@ def pipeline_retrieval (queries, vectorizer):
     pre_processed_queries=[extraction_lemmi_from_sentence(q) for q in queries ]
     query_vector = vectorizer.transform(pre_processed_queries)
     return query_vector
-
+'''
 def search_and_display_queries(query_vector, queries, X_tfidf, df_sampled, TOP_N):
 
     similarities = cosine_similarity(query_vector, X_tfidf).flatten()
-    top_indices = similarities.argsort()[::-1][:TOP_N]
+    top_indices = np.argsort(similarities)[::-1][:TOP_N]
+
+    print("→ Indici ottenuti dalla similarità (posizioni nella matrice):", top_indices)
+    print("→ Indici reali del DataFrame sampled:", df_sampled.index.tolist()[:10])  # stampane solo alcuni
 
     table = Table(title=f"Top {TOP_N} risultati per: '{queries}'")
     table.add_column("Score", justify="right", style="cyan")
@@ -59,11 +63,40 @@ def search_and_display_queries(query_vector, queries, X_tfidf, df_sampled, TOP_N
     table.add_column("Category", style="green")
 
     for idx in top_indices:
-      true_idx = df_sampled.index[idx]  # Usa l'indice vero invece della posizione numerica
+      #true_idx = df_sampled.index[idx]  # Usa l'indice vero invece della posizione numerica
+
+
       print(f"→ Similarità: {similarities[idx]:.3f}")
-      print(f"Headline: {df_sampled.loc[true_idx, 'headline']}")
-      print(f"Categoria: {df_sampled.loc[true_idx, 'category']}\n")
+      print(f"Headline: {df_sampled.iloc[idx]['headline']}")
+      print(f"Categoria: {df_sampled.iloc[idx]['category']}")
+      table.add_row(f"{similarities[idx]:.3f}", df_sampled.iloc[idx]['headline'], df_sampled.iloc[idx]['category'])
+
 
 
     console.print(table)
+'''
+def search_and_display_queries(query_vector, queries, X_tfidf, df_sampled, TOP_N):
+    for q_idx, query in enumerate(queries):
+        print(f"\nTop {TOP_N} risultati per: '{query}'")
 
+        # Calcola le similarità per la query corrente
+        similarities = cosine_similarity(query_vector[q_idx], X_tfidf).flatten()
+        top_indices = np.argsort(similarities)[::-1][:TOP_N]
+
+        # Crea la tabella
+        table = Table(title=f"Top {TOP_N} risultati per: '{query}'")
+        table.add_column("Score", justify="right", style="cyan")
+        table.add_column("Headline", style="bold")
+        table.add_column("Category", style="green")
+
+        # Aggiungi i risultati nella tabella
+        for idx in top_indices:
+            # Nessun controllo sugli indici, assumendo che siano validi
+            table.add_row(
+                f"{similarities[idx]:.3f}",
+                df_sampled.iloc[idx]['headline'],
+                df_sampled.iloc[idx]['category']
+            )
+
+        # Stampa la tabella
+        console.print(table)
