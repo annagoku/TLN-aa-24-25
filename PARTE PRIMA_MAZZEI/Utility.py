@@ -120,15 +120,11 @@ def exstract_listed_words(user_message, correct_answer, key_word):
 
 
 def check_answer_no_list(user_message, correct_answer, key_word, type):
-    
     ordinal_stopwords = {"first", "second", "third", "fourth", "fifth", "last", "next", "previous"}
-
     if type=="binary": 
       correct_answer=str(correct_answer)
-    user_message = user_message.replace(correct_answer, "")
-    
-    doc_user_message = nlp(user_message.lower())
-    
+    user_message = user_message.replace(correct_answer, "")    
+    doc_user_message = nlp(user_message.lower())    
     word_user = set()
     for token in doc_user_message:
         if token.pos_ in {"NOUN"} and token.lemma_.lower() not in ordinal_stopwords and token.text not in ordinal_stopwords:
@@ -137,15 +133,11 @@ def check_answer_no_list(user_message, correct_answer, key_word, type):
       proper_names = parser_proper_name(user_message)
       for name in proper_names:
           word_user.add(name)
-
-
     print("Parole utente:", word_user)
-
     print("Risposta corretta:", correct_answer)
     word_keyword = set(key_word)
     print("Parole key:", word_keyword)
-
-    if not word_user or word_user.issubset(word_keyword):
+    if not word_user or word_user.issubset(word_keyword): #se l'insieme dei nomi della risposta dell'utente è un sottoinsieme dell'insieme delle keyword allora la risposta non contiene errori semantici 
         print("subset trovato:", word_user.issubset(word_keyword))
         return True
     print("subset trovato:", word_user.issubset(word_keyword))

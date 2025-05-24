@@ -196,7 +196,7 @@ def generate_name_question(entity):
     output = realize_output(phrase)
     return output
 
-def generate_how_many_question(subject, entity,):
+def generate_how_many_question(subject, entity):
     """
     Genera una domanda "How many ... have been made about ...?" in modo parametrico.
     :param entity: L'entità di cui si vuole sapere la quantità (es. "film")

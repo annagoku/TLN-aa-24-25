@@ -96,11 +96,20 @@ class ChatBotGui:
 
   def mng_user_input(self):
       user_message = self.user_input.get().strip()
+                
       if user_message!='' and glvar.state_dialog>=0:
          u.simulate_typing(self.chat_history, "Player: "+ user_message + "\n", tag="player", submit_button=self.submit_button, user_input=self.user_input)
          print(user_message)
          self.chat_history.after(2000, lambda: self.process_bot_response(user_message))  
       else: 
+         if glvar.text_button=='Enter':
+            u.simulate_typing(
+                self.chat_history,
+                "Player:\n",
+                tag="player",
+                submit_button=self.submit_button,
+                user_input=self.user_input
+            )
          self.change_text()
          l.mng_dialog(user_message, self.chat_history, submit_button=self.submit_button, user_input=self.user_input)  # Ottieni la risposta
       
