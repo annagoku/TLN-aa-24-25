@@ -111,7 +111,7 @@ def start_exam():
     output = realize_output(proposition)
     return output
 
-def generate_when_question(subject, event): # funzionante ma può essere generalizzato meglio
+def generate_when_question(subject, complement,verb):
     """
     Genera una domanda del tipo "When did Lara Croft start her adventure?"
     :param event: L'azione che si vuole interrogare (es. "start her adventure")
@@ -124,15 +124,21 @@ def generate_when_question(subject, event): # funzionante ma può essere general
     phrase=nlgFactory.createClause()
 
     noun = nlgFactory.createNounPhrase(subject)  # Crea il nome
-    noun.setFeature(simplenlg.Feature.PERSON, True)  # Indica che è un nome proprio
+    complement_np = nlgFactory.createNounPhrase(complement)
+    
+    # Crea la frase preposizionale "of Lara Croft"
+    pp = nlgFactory.createPrepositionPhrase()
+    pp.setPreposition("of")
+    pp.setObject(complement_np)
+    
+    # Aggiungi il complemento al soggetto
+    noun.addPostModifier(pp)
     
     phrase.setSubject(noun)  # Imposta il nome proprio come soggetto
 
     # Imposta il verbo
-    phrase.setVerb("be")  # Necessario per le domande al passato
+    phrase.setVerb(verb)  # Necessario per le domande al passato
     phrase.setFeature(simplenlg.Feature.TENSE, simplenlg.Tense.PAST)
-    #phrase.setFeature(simplenlg.Feature.PASSIVE, True)
-    phrase.addComplement(event)
 
     # Trasforma in una domanda
     phrase.setFeature(featureName=simplenlg.Feature.INTERROGATIVE_TYPE, featureValue=simplenlg.InterrogativeType.YES_NO)
@@ -147,13 +153,13 @@ def generate_when_question(subject, event): # funzionante ma può essere general
 
 
 
-def generate_list_question(quantity,subject, context):
+def generate_list_question(quantity,subject, context=None):
     """
     Genera una domanda interrogativa per elenchi usando simpleNLG.
     
     :param quantity: Quantità minima richiesta (es. "two")
     :param items: Oggetto della domanda (es. "weapons")
-    :param context: Contesto specifico (es. "used by Lara Croft", "of the movie Tomb Raider: The Cradle of Life")
+    :param context: Contesto specifico (es. "of Lara Croft", "of the movie Tomb Raider: The Cradle of Life")
     :return: Una frase interrogativa ben formata.
     """
     # Crea la frase principale
@@ -168,7 +174,11 @@ def generate_list_question(quantity,subject, context):
 
     # Aggiunge il contesto (se esiste)
     if context:
-        phrase.addComplement(context)  # Es. "used by Lara Croft"
+        context_np = nlgFactory.createNounPhrase(context)
+        pp = nlgFactory.createPrepositionPhrase()
+        pp.setPreposition("of")
+        pp.setObject(context_np)
+        object_to_list.addPostModifier(pp)
 
     # Imposta la domanda con "What"
     phrase.setFeature(simplenlg.Feature.INTERROGATIVE_TYPE, simplenlg.InterrogativeType.WHAT_OBJECT)
@@ -181,12 +191,12 @@ def generate_name_question(entity):
     """
     Genera una domanda per chiedere il nome di una persona o entità.
 
-    :param entity: Il soggetto della domanda (es. "you", "Lara Croft's father")
+    :param entity: Il soggetto terza persona della domanda (es.  "Lara Croft's father")
     :return: Frase interrogativa ben formata.
     """
     # Crea la frase principale
     phrase = init()
-    phrase.setSubject(entity + "'s name")  # Es. "your name", "Lara Croft's father's name"
+    phrase.setSubject(entity + "'s name")  # "Lara Croft's father's name"
     phrase.setVerb("be")  # Imposta "is"
 
     # Imposta la domanda con "What"
@@ -230,25 +240,161 @@ def generate_how_many_question(subject, entity):
     return output
 
 
-def generate_true_false_question(subject, complement, action):
+def generate_true_false_question(subject, verb, complement):
     """
     Genera una domanda vero/falso in modo parametrico.
-    :param subject: Il soggetto principale della domanda (es. "London")
-    :param location: Il luogo o complemento della frase (es. "the place")
-    :param action: L'azione compiuta dal soggetto (es. "where Lara Croft looked for her father")
+    :param subject: Il soggetto principale della domanda (es. "Lara Croft")
+    :param location: Il luogo o complemento della frase (es. "an archeologist")
+    :param verb: L'azione compiuta dal soggetto (es. "be")
     :return: Stringa con la domanda generata
     """
     phrase=init()
     
     # Imposta la domanda vero/falso in forma più semplice
     phrase.setSubject(subject)
-    phrase.setVerb("be")
+    phrase.setVerb(verb)
     phrase.setFeature(simplenlg.Tense.PRESENT, True)
-    phrase.addComplement(complement + " " + action)
+    phrase.addComplement(complement)
     phrase.setFeature(simplenlg.Feature.INTERROGATIVE_TYPE, simplenlg.InterrogativeType.YES_NO)
     
      # Realize the sentence (convert it to text)
     output = realize_output(phrase)
     return output
 
+def generate_bravery_sentence():
+    # Inizializza la frase
+    phrase = nlgFactory.createClause()
+    
+    # Soggetto: "you"
+    phrase.setSubject("you")
+    
+    # Verbo: "be"
+    phrase.setVerb("be")
+    
+    # Negazione
+    phrase.setFeature(simplenlg.Feature.NEGATED, True)
 
+    # Complemento: "brave enough for this challenge"
+    brave_adj = nlgFactory.createAdjectivePhrase("brave")
+    brave_adj.addPostModifier("enough")
+    
+    # Preposizione: "for this challenge"
+    pp = nlgFactory.createPrepositionPhrase()
+    pp.setPreposition("for")
+    pp.setObject(nlgFactory.createNounPhrase("this", "challenge"))
+    
+    # Aggiungi tutto al complemento del verbo
+    phrase.addComplement(brave_adj)
+    phrase.addComplement(pp)
+    
+    return realize_output(phrase)
+
+def generate_see_you_sentence():
+    # Crea una clausola
+    phrase = nlgFactory.createClause()
+    
+    # Imposta il verbo come imperativo
+    phrase.setVerb("see")
+    phrase.setFeature(simplenlg.Feature.FORM, simplenlg.Form.IMPERATIVE)
+
+    # Aggiungi l'oggetto diretto "you"
+    phrase.setObject("you")
+
+    # Aggiungi il complemento "next time"
+    phrase.addComplement("next time")
+    
+    return realize_output(phrase)
+
+def generate_gain_points_sentence():
+    # Crea la frase
+    phrase = nlgFactory.createClause()
+    
+    # Soggetto
+    phrase.setSubject("you")
+    
+    # Verbo
+    phrase.setVerb("gain")
+    
+    # Oggetto: "10 points"
+    object_np = nlgFactory.createNounPhrase("point")
+    object_np.setPlural(True)
+    object_np.addPreModifier("10")
+    phrase.setObject(object_np)
+    
+    return realize_output(phrase)
+
+def generate_0_10_point_sentence():
+    # Frase principale: "You lied"
+    main_clause = nlgFactory.createClause()
+    main_clause.setSubject("you")
+    main_clause.setVerb("lie")
+    main_clause.setFeature(simplenlg.Feature.TENSE, simplenlg.Tense.PAST)
+
+    # Frase subordinata: "you said you had studied"
+    embedded_clause = nlgFactory.createClause()
+    embedded_clause.setSubject("you")
+    embedded_clause.setVerb("say")
+    embedded_clause.setFeature(simplenlg.Feature.TENSE, simplenlg.Tense.PAST)
+
+    # Subordinata oggettiva: "you had studied"
+    inner_clause = nlgFactory.createClause()
+    inner_clause.setSubject("you")
+    inner_clause.setVerb("study")
+    inner_clause.setFeature(simplenlg.Feature.TENSE, simplenlg.Tense.PAST)
+    inner_clause.setFeature(simplenlg.Feature.PERFECT, True)
+
+    # Aggiungi "you had studied" come oggetto di "you said"
+    embedded_clause.setObject(inner_clause)
+
+    # Inserisci "when you said you had studied" come complemento della principale
+    main_clause.addComplement("when " + realize_output(embedded_clause))
+
+    return realize_output(main_clause)
+
+def generate_20_points_sentence():
+    # Soggetto: "my adventures"
+    subject_np = nlgFactory.createNounPhrase("my", "adventure")
+    subject_np.setPlural(True)
+
+    # Frase principale
+    clause = nlgFactory.createClause()
+    clause.setSubject(subject_np)
+    clause.setVerb("be")
+
+    # Predicato: "still too dangerous"
+    adj_phrase = nlgFactory.createAdjectivePhrase("dangerous")
+    adj_phrase.addPreModifier("still too")
+    
+    
+
+    # Aggiunge "for you" come complemento
+    pp = nlgFactory.createPrepositionPhrase()
+    pp.setPreposition("for")
+    pp.setObject("you")
+
+    # Assegna il complemento predicativo
+    clause.setComplement(adj_phrase)
+    clause.addComplement(pp)
+
+    return realize_output(clause)
+
+def generate_30_points_sentence():
+   # Crea il soggetto
+    subject = nlgFactory.createNounPhrase("you")
+
+    # Crea la frase principale
+    clause = nlgFactory.createClause()
+    clause.setSubject(subject)
+    clause.setVerb("be")
+    clause.setComplement("ready")
+
+    # Crea la prepositional phrase: "for my next mission"
+    pp = nlgFactory.createPrepositionPhrase()
+    pp.setPreposition("for")
+    pp.setObject("my next mission")
+
+    # Aggiunge il complemento preposizionale
+    clause.addPostModifier(pp)
+
+
+    return realize_output(clause)
