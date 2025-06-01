@@ -111,45 +111,59 @@ def start_exam():
     output = realize_output(proposition)
     return output
 
-def generate_when_question(subject, complement,verb):
+def generate_when_question(subject, complement, verb):
     """
-    Genera una domanda del tipo "When did Lara Croft start her adventure?"
-    :param event: L'azione che si vuole interrogare (es. "start her adventure")
+    Genera una domanda temporale ("When") come:
+    - "When was Lara Croft born?"
+    - "When did the first videogame of Lara Croft release?"
+    
     :param subject: Il soggetto principale della domanda (es. "Lara Croft")
-    :return: Stringa con la frase generata
+    :param complement: Il complemento (es. "the first videogame")
+    :param verb: Il verbo principale (es. "be", "release", "born")
+    :return: Stringa con la frase interrogativa generata
     """
-   
-    subject=subject.title()
+    
+    subject = subject.title()
     phrase = init()
-    phrase=nlgFactory.createClause()
+    phrase = nlgFactory.createClause()
 
-    noun = nlgFactory.createNounPhrase(subject)  # Crea il nome
-    complement_np = nlgFactory.createNounPhrase(complement)
+    # Crea soggetto
+    subject_np = nlgFactory.createNounPhrase(subject)
     
-    # Crea la frase preposizionale "of Lara Croft"
-    pp = nlgFactory.createPrepositionPhrase()
-    pp.setPreposition("of")
-    pp.setObject(complement_np)
-    
-    # Aggiungi il complemento al soggetto
-    noun.addPostModifier(pp)
-    
-    phrase.setSubject(noun)  # Imposta il nome proprio come soggetto
+    # Se esiste un complemento, aggiungilo come post-modificatore
+    if complement:
+        complement_np = nlgFactory.createNounPhrase(complement)
+        pp = nlgFactory.createPrepositionPhrase()
+        pp.setPreposition("of")
+        pp.setObject(subject_np)
+        complement_np.addPostModifier(pp)
+        phrase.setSubject(complement_np)
+    else:
+        phrase.setSubject(subject_np)
 
-    # Imposta il verbo
-    phrase.setVerb(verb)  # Necessario per le domande al passato
-    phrase.setFeature(simplenlg.Feature.TENSE, simplenlg.Tense.PAST)
+    # Gestione speciale per "be" e "born"
+    if verb.lower() in ["be", "was", "is"] or "born" in verb.lower():
+        phrase.setVerb("be")
+        phrase.setFeature(simplenlg.Feature.TENSE, simplenlg.Tense.PAST)
+        phrase.setFeature(featureName=simplenlg.Feature.INTERROGATIVE_TYPE, featureValue=simplenlg.InterrogativeType.YES_NO)
+        phrase.setComplement("born")
+    else:
+        phrase.setVerb(verb)
+        phrase.setFeature(simplenlg.Feature.TENSE, simplenlg.Tense.PAST)
+        phrase.setFeature(featureName=simplenlg.Feature.INTERROGATIVE_TYPE, featureValue=simplenlg.InterrogativeType.YES_NO)
 
-    # Trasforma in una domanda
-    phrase.setFeature(featureName=simplenlg.Feature.INTERROGATIVE_TYPE, featureValue=simplenlg.InterrogativeType.YES_NO)
-
-    # Realizza la frase base
+    # Realizza la frase
     sentence = realize_output(phrase)
 
-    # Aggiungi manualmente "When" davanti
-    output = f"When {sentence.lower()}"
+    # Assicura che inizi con "When"
+    if not sentence.lower().startswith("when"):
+        sentence = "When " + sentence[0].lower() + sentence[1:]
 
-    return output
+    # Assicura il punto interrogativo
+    if not sentence.endswith("?"):
+        sentence += "?"
+
+    return sentence
 
 
 
@@ -341,7 +355,7 @@ def generate_0_10_point_sentence():
     inner_clause.setSubject("you")
     inner_clause.setVerb("study")
     inner_clause.setFeature(simplenlg.Feature.TENSE, simplenlg.Tense.PAST)
-    inner_clause.setFeature(simplenlg.Feature.PERFECT, True)
+    #inner_clause.setFeature(simplenlg.Feature.PERFECT, True)
 
     # Aggiungi "you had studied" come oggetto di "you said"
     embedded_clause.setObject(inner_clause)

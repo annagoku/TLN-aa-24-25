@@ -86,10 +86,10 @@ def mng_dialog(user_message, chat_history, submit_button, user_input):
           if answer:
             glvar.punteggio=glvar.punteggio+10
             print(glvar.punteggio)
-            Lara_response=sp.build_phrase("Good! Correct answer!")+ sp.generate_gain_points_sentence() 
+            Lara_response=sp.build_phrase("Good! Correct answer")+ sp.generate_gain_points_sentence() 
             d.update_point_for_player(glvar.punteggio)
           else:
-            Lara_response=sp.build_phrase ("Bad response! Sorry, no points gained.")
+            Lara_response=sp.build_phrase ("Bad response! Sorry, no points gained")
         
           if glvar.state_dialog<3:
             glvar.state_dialog=glvar.state_dialog+1
@@ -104,9 +104,9 @@ def mng_dialog(user_message, chat_history, submit_button, user_input):
               if glvar.punteggio<=10:
                   End_game=str(glvar.punteggio) +" points. "+sp.generate_0_10_point_sentence() + sp.build_phrase("Please, be honest next time.")            
               elif glvar.punteggio==20:
-                  End_game=str(glvar.punteggio) +" points. "+ sp.build_phrase("Good but not the best!") + sp.generate_20_points_sentence() 
+                  End_game=str(glvar.punteggio) +" points. "+ sp.build_phrase("Good but not the best") + sp.generate_20_points_sentence() 
               elif glvar.punteggio==30:
-                  End_game=str(glvar.punteggio)+" points. "+sp.build_phrase("Well done!") + sp.generate_30_points_sentence()
+                  End_game=str(glvar.punteggio)+" points. "+sp.build_phrase("Well done") + sp.generate_30_points_sentence()
               glvar.end_game=True #Interruzione del gioco e disabilitazione elementi di interfaccia in simulate typing    
               u.simulate_typing(chat_history, "Lara: "+ Lara_response + " "+"\n" + "Lara: "+ End_game, tag="lara", submit_button=submit_button, user_input=user_input)
 
@@ -207,9 +207,12 @@ def generate_question_text(type, param):
         else:
             print("Invalid parameters for binary question.")
     if type=="year":
-         if len(param) >= 3:  # Assicuriamoci che ci siano abbastanza elementi nel vettore
-            subject, complement, verb = param[0], param[1], param[2]
+         if len(param) == 3:  # Assicuriamoci che ci siano abbastanza elementi nel vettore
+            complement, subject, verb = param[0], param[1], param[2]
             text = sp.generate_when_question(subject, complement, verb)
+         elif len(param) == 2:  # Assicuriamoci che ci siano abbastanza elementi nel vettore
+            subject, verb = param[0], param[1],
+            text = sp.generate_when_question(subject, "", verb)
          else:
             print("Invalid parameters for year question.")
     if type=="number":

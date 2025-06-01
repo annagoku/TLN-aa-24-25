@@ -120,13 +120,14 @@ def exstract_listed_words(user_message, correct_answer, key_word):
 
 
 def check_answer_no_list(user_message, correct_answer, key_word, type):
-    ordinal_stopwords = {"first", "second", "third", "fourth", "fifth", "last", "next", "previous"}
+    ordinal_stopwords = {"first", "second", "third", "fourth", "fifth", "last", "next", "previous","course"}
     if type=="binary": 
       correct_answer=str(correct_answer)
     user_message = user_message.replace(correct_answer, "")    
     doc_user_message = nlp(user_message.lower())    
     word_user = set()
     for token in doc_user_message:
+        print(f"TOKEN: {token.text}, POS: {token.pos_}, LEMMA: {token.lemma_}")
         if token.pos_ in {"NOUN"} and token.lemma_.lower() not in ordinal_stopwords and token.text not in ordinal_stopwords:
             word_user.add(token.lemma_.lower())
     if type!="proper name":

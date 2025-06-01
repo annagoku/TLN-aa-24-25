@@ -34,13 +34,15 @@ class ChatBotGui:
     y_cordinate = int((screen_height/2) - (window_height/2))
 
     self.window_game.geometry("{}x{}+{}+{}".format(window_width, window_height, x_cordinate, y_cordinate))
-
+    
+    
     # Carica l'immagine
-    self.image = Image.open('LaraCroft.png')
-    self.image = self.image.resize((314, 538))  # Ridimensiona l'immagine se necessario
+    ''''
+    self.image = Image.open('LaraCroft_Black.png')
+    self.image = self.image.resize((314, 600))  # Ridimensiona l'immagine se necessario
     self.image = ImageTk.PhotoImage(self.image)
-    
-    
+    '''
+    self.load_image_with_black_background('LaraCroft_Black.png', (314, 700))
     # Crea un frame per l'immagine
     image_frame = tk.Frame(self.window_game)
     image_frame.pack(side="left", padx=20)  # Posizioniamo il frame a sinistra
@@ -73,15 +75,15 @@ class ChatBotGui:
   # Pulsante di uscita (inizialmente nascosto)
     self.exit_button = tk.Button(input_frame, text="Exit", font="Helvetica 14 bold", bg="grey", fg="white", width=10, command=lambda: cg.close_game(self.window_game))
     self.exit_button.grid(row=2, column=1, padx=(0, 5), pady=(0, 30), sticky="n")
-    self.exit_button.grid_remove()
-    #self.exit_button.grid()
-
+    #self.exit_button.grid_remove()
+    self.exit_button.grid()
+  '''
   # Pulsante di riavvio (inizialmente nascosto)
     self.restart_button = tk.Button(input_frame, text="Restart", font="Helvetica 14 bold", bg="grey", fg="white", width=10, command=self.restart_game)
     self.restart_button.grid(row=1, column=1, padx=(0, 5), pady=(0, 30), sticky="n")
     self.restart_button.grid_remove()
     #self.restart_button.grid()
-
+  '''
 
   def change_text(self):
       glvar.text_button="Enter"
@@ -118,18 +120,18 @@ class ChatBotGui:
       l.mng_dialog(user_message, self.chat_history, submit_button=self.submit_button, user_input=self.user_input)  # Ottieni la risposta
   
   def show_end_buttons(self):
-    self.exit_button.grid()
-    self.restart_button.grid()
+    #self.exit_button.grid()
+    #self.restart_button.grid()
     self.submit_button.config(state='disabled')
     self.user_input.config(state='disabled')
-
+  '''
   def restart_game(self):
     glvar.reset()  # Reset di tutte le variabili globali in una condizione di inizio gioco
     glvar.gui=self
     self.chat_history.delete('1.0', tk.END)
     self.user_input.config(state='normal')
     self.submit_button.config(state='normal')
-    self.exit_button.grid_remove()
+    #self.exit_button.grid_remove()
     self.restart_button.grid_remove()
     
     # Ripristina testo del pulsante
@@ -149,3 +151,26 @@ class ChatBotGui:
         submit_button=self.submit_button,
         user_input=self.user_input
     )
+'''
+  def load_image_with_black_background(self, filepath, size=None):
+    image = Image.open(filepath).convert("RGBA")
+
+    # Elimina pixel quasi trasparenti per il bounding box (ritaglio)
+    alpha = image.split()[-1]  # canale alpha
+    bbox = alpha.point(lambda p: p > 10 and 255).getbbox()  # soglia trasparenza = 10
+
+    if bbox:
+        image = image.crop(bbox)
+
+    # Sovrapponi su sfondo nero
+    black_bg = Image.new("RGBA", image.size, (0, 0, 0, 255))
+    image = Image.alpha_composite(black_bg, image)
+
+    # Ridimensiona se specificato
+    if size:
+        image = image.resize(size)
+
+    # Converti in RGB (senza trasparenza) per Tkinter
+    image_rgb = image.convert("RGB")
+    self.image = ImageTk.PhotoImage(image_rgb)
+
