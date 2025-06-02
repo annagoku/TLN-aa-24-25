@@ -1,8 +1,9 @@
 import tkinter as tk
 import pygame as py
-from PIL import Image, ImageTk 
+from PIL import Image, ImageTk
+from ChatBotGui import ChatBotGui 
 import ControllerGame as cg
-#import WindowsGame as wg
+
 
 
 
@@ -38,13 +39,13 @@ def init_gui():
   frame = tk.Frame(windows_root, background="black")
   frame.pack(pady=50,side=tk.BOTTOM )  # Posizioniamo il frame a metà altezza
 
-  start_button=tk.Button(frame, text="New Game",background="grey", fg="white", font="Helvetica 14 bold",  height=2, width=10, command= lambda: cg.start_new_game(windows_root))
+  start_button=tk.Button(frame, text="New Game",background="darkgreen", fg="white", font="Helvetica 14 bold",  height=2, width=10, command= lambda: cg.start_new_game(windows_root))
   start_button.pack(padx=20, side=tk.LEFT)
 
   quit_button=tk.Button(frame, text="Exit",background="grey", fg="white", font="Helvetica 14 bold", height=2, width=10, command= lambda : cg.exitApplication(windows_root))
   quit_button.pack(padx=20, side=tk.LEFT)
 
-  credits_button=tk.Button(frame, text="@Credits", background="grey", fg="white", font="Helvetica 14 bold", height=2, width=10, command=cg.print_credit)
+  credits_button=tk.Button(frame, text="@Credits", background="darkblue", fg="white", font="Helvetica 14 bold", height=2, width=10, command=cg.print_credit)
   credits_button.pack(padx=20, side=tk.LEFT)
 
   windows_root.mainloop()

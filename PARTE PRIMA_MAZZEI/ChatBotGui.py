@@ -59,22 +59,22 @@ class ChatBotGui:
     #Campo di chat
     self.chat_history = scrolledtext.ScrolledText(input_frame, wrap=tk.WORD, width=60, height=20, state='normal')
     self.chat_history.grid(row=0, column=0, padx=10, pady=20, sticky="e")  # Allineata a destra
-    self.chat_history.tag_configure("player", foreground="blue")
-    self.chat_history.tag_configure("lara", foreground="darkred")
+    self.chat_history.tag_configure("player", foreground="darkblue")
+    self.chat_history.tag_configure("lara", foreground="darkgreen")
 
   # Campo per inserimento di testo 
     self.user_input = tk.Entry(input_frame, width=60)
     self.user_input.grid(row=1, column=0,padx=10, pady=5)
 
   # Pulsante di invio (posizionato sotto)
-    self.submit_button = tk.Button(input_frame, font="Helvetica 14 bold", bg="grey", fg="white", width=10, text=glvar.text_button, command=self.mng_user_input)
-    self.submit_button.grid(row=3, column=1, padx=(0, 5), sticky="e")
+    self.submit_button = tk.Button(input_frame, font="Helvetica 14 bold", bg="darkgreen", fg="white", width=10, text=glvar.text_button, command=self.mng_user_input)
+    self.submit_button.grid(row=2, column=1, padx=(0, 5), pady=(0, 30), sticky="n")
 
     self.window_game.after(1000, self.displayFirst_message)
   
   # Pulsante di uscita (inizialmente nascosto)
     self.exit_button = tk.Button(input_frame, text="Exit", font="Helvetica 14 bold", bg="grey", fg="white", width=10, command=lambda: cg.close_game(self.window_game))
-    self.exit_button.grid(row=2, column=1, padx=(0, 5), pady=(0, 30), sticky="n")
+    self.exit_button.grid(row=3, column=1, padx=(0, 5), sticky="e")
     #self.exit_button.grid_remove()
     self.exit_button.grid()
   '''
@@ -124,7 +124,7 @@ class ChatBotGui:
     #self.restart_button.grid()
     self.submit_button.config(state='disabled')
     self.user_input.config(state='disabled')
-  '''
+  
   def restart_game(self):
     glvar.reset()  # Reset di tutte le variabili globali in una condizione di inizio gioco
     glvar.gui=self
@@ -132,14 +132,14 @@ class ChatBotGui:
     self.user_input.config(state='normal')
     self.submit_button.config(state='normal')
     #self.exit_button.grid_remove()
-    self.restart_button.grid_remove()
+    #self.restart_button.grid_remove()
     
     # Ripristina testo del pulsante
     glvar.text_button = "Start chat"
     self.submit_button.config(text=glvar.text_button)
 
     # Mostra il messaggio iniziale
-    self.window_game.after(500, self.displayFirst_message)
+    #self.window_game.after(500, self.displayFirst_message)
 
   
   def displayFirst_message(self):
@@ -151,7 +151,7 @@ class ChatBotGui:
         submit_button=self.submit_button,
         user_input=self.user_input
     )
-'''
+
   def load_image_with_black_background(self, filepath, size=None):
     image = Image.open(filepath).convert("RGBA")
 

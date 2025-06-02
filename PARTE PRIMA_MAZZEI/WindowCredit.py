@@ -32,5 +32,5 @@ def init_gui_credit():
   bg_label.pack(pady=40,side=tk.TOP)
   bg_label.image = image
 
-  exit_button=tk.Button(windows_credit, text="Close",background="grey", fg="white", font="Helvetica 12 bold", height=1, width=7, command=windows_credit.destroy)
+  exit_button=tk.Button(windows_credit, text="Close",background="darkblue", fg="white", font="Helvetica 12 bold", height=1, width=7, command=windows_credit.destroy)
   exit_button.pack(padx=100,pady=20, side=tk.BOTTOM)

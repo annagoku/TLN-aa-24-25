@@ -41,6 +41,7 @@ def start_new_game(start_window):
     start_window.destroy()
     app = ChatBotGui()
     glvar.gui=app
+    glvar.gui.restart_game()
     app.run()
 
 
