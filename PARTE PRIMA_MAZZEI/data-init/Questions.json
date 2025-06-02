@@ -1,0 +1,9 @@
+[
+{"code":1,"type":"binary","question":"Is Lara Croft an archaeologist?","keyWord":["archaeologist","Lara Croft","Lara","yes"],"param":["Lara Croft","be","an archaeologist"],"answer":true},
+{"code":2,"type":"year","question":"When was Lara Croft born?","keyWord":["year","born","Lara Croft","Lara"],"param":["Lara Croft","born"],"answer":"1968"},
+{"code":3,"type":"list","question":"What are two weapons of Lara Croft?","keyWord":["weapons","arms"],"param":["two","weapon","Lara Croft"],"answer":["pistols","shotgun","submachine gun","rifle","crossbow","grenade","M16 rifle","arrows","pickaxe","knife","revolver","explosives","silenced SMG","compound bow","assault rifle"]},
+{"code":4,"type":"year","question":"When did the first videogame of Lara Croft release?","keyWord":["year","videogame","Lara Croft","Lara","first"],"param":["the first video game","Lara Croft","release"],"answer":"1996"},
+{"code":5,"type":"number","question":"How many films are there about Lara?","keyWord":["film","Lara Croft","Lara"],"param":["film","Lara"],"answer":"3"},
+{"code":6,"type":"list","question":"What are two settings of the movie Tomb Raider: The Cradle of life?","keyWord":["places","settings"],"param":["two","settings","the movie Tomb Raider: The Cradle of life"],"answer":["Greece","Tibet","England"]},
+{"code":7,"type":"proper name","question":"What is Lara Croft's father's name?","keyWord":["father","name","Lara Croft","Lara"],"param":["Lara Croft's father"],"answer":"Richard Croft"}
+]
