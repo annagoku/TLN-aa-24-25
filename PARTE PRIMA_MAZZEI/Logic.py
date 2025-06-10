@@ -43,14 +43,15 @@ def mng_dialog(user_message, chat_history, submit_button, user_input):
         u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", tag="lara", submit_button=submit_button, user_input=user_input)
     elif glvar.state_dialog==0:
          user_name=user_message.lower()
-         name=u.parser_nen(user_name).capitalize() #attenzione alla maiusola
+         name=u.parser_nen(user_name) #attenzione alla maiusola
 
          print(name)
          if name is None or name=='':
            Lara_response=sp.no_answer("your", "name")
            u.simulate_typing(chat_history, "Lara: "+ Lara_response + "\n", tag="lara", submit_button=submit_button, user_input=user_input)
          else:
-            glvar.player_name=name
+            name=name.capitalize()
+            glvar.player_name=name.capitalize()
             d.save_name(glvar.player_name)
             glvar.state_dialog=1
             temp=sp.verb_subj("study", "you")
@@ -154,7 +155,7 @@ def mng_question_number(user_message, correct_answer):
     return answer
     
 def mng_question_properName(user_message,correct_answer):
-    user_message=user_message.capitalize()
+    user_message=user_message
     name=u.parser_proper_name(user_message)
     print(name)
     if correct_answer in name:
@@ -164,8 +165,8 @@ def mng_question_properName(user_message,correct_answer):
     return answer
    
 def mng_question_list(user_message,correct_answer, key_word):
-    user_message=user_message.lower()
-    word_filtered=u.exstract_listed_words(user_message, correct_answer.lower(), key_word)
+    
+    word_filtered=u.exstract_listed_words(user_message, correct_answer, key_word)
     # Trova le parole che coincidono con quelle della risposta corretta
     matching_words = [word for word in word_filtered if word in correct_answer]
     # Stampa Input/Output per debug

@@ -90,7 +90,7 @@ def exstract_listed_words(user_message, correct_answer, key_word):
     :param parole_generiche: Lista di parole da escludere
     :return: Lista di parole chiave estratte
     """
-   
+    user_message = " ".join(user_message.split())  # Rimuove spazi multipli
     doc = nlp(user_message)
     
     # Converti parole generiche in un set per efficienza
