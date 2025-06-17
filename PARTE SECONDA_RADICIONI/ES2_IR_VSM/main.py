@@ -44,11 +44,7 @@ if __name__ == "__main__":
     #pipelines
     vectorizer = TfidfVectorizer(lowercase=False, stop_words=None)
     pre_processed_sentence=[u.extraction_lemmi_from_sentence(s) for s in sampled_sentece ]
-    '''
-    for i in range(10):  # prime 10
-      print(f"Frase: {sampled_sentece[i]}")
-      print(f"Lemmi: {pre_processed_sentence[i]}\n")
-    '''
+    
     
     X_tfidf = u.pipeline_vectorize_training(pre_processed_sentence, vectorizer)
 
@@ -57,8 +53,7 @@ if __name__ == "__main__":
 
     # Stampa dimensioni e qualche esempio
     print("Shape della matrice TF-IDF:", X_tfidf.shape)
-    #print("Parole usate nel vocabolario:", vectorizer.get_feature_names_out()[:10])  # prime 10
-    #print("TF-IDF per il primo documento:\n", X_tfidf[0].toarray())
+    
 
     queries=[]
     # Prompt per query multiple
