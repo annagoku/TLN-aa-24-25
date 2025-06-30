@@ -35,15 +35,27 @@ def populate_results_table(terms, N_WORDS):
         code_disambiguation = la.lesk_algorithm(elem[0], elem[2])  # LESK defined
         nltk_disambiguation = lesk(elem[2], elem[0], 'n')  # LESK NLTK
 
-        # Aggiungi la riga alla tabella
+                # Confronti sicuri
+        if code_disambiguation is None or elem[1] is None:
+            code_result = "❌"
+        else:
+            code_result = "✔️" if code_disambiguation == elem[1] else "❌"
+
+        if nltk_disambiguation is None or elem[1] is None:
+            nltk_result = "❌"
+        else:
+            nltk_result = "✔️" if nltk_disambiguation == elem[1] else "❌"
+
+        # Aggiunta riga alla tabella
         table.add_row(
-            elem[0], 
-            str(elem[1]), 
+            elem[0],
+            str(elem[1]),
             str(code_disambiguation) if code_disambiguation else "Nessun risultato",
             str(nltk_disambiguation) if nltk_disambiguation else "Nessun risultato",
-            "✔️" if code_disambiguation == elem[1] else "❌", 
-            "✔️" if nltk_disambiguation == elem[1] else "❌"
+            code_result,
+            nltk_result
         )
+
 
         # Conta i termini corretti
         code_correct_wsd = code_correct_wsd + 1 if elem[1] == code_disambiguation else code_correct_wsd

@@ -44,7 +44,7 @@ def extraction_terms_from_corpus(num_words):
         sentence_tagged = SEMCOR_TAGGED_SENTS[rand_index]
         sentence_plain = SEMCOR_SENTS[rand_index]
 
-        # Trova tutti i candidati validi nella frase
+        # Trova tutti i candidati validi nella frase. Un candidato valido è un termine polisemico presente in più di un synset
         candidate_nouns = []
         for chunk in sentence_tagged:
             if isinstance(chunk.label(), Lemma):

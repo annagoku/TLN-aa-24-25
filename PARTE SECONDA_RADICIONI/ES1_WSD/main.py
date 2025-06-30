@@ -8,15 +8,18 @@ import nltk
 
 # Verifica e scarica le risorse NLTK se mancanti
 try:
+    print("Controllo e download WordNet (inglese)")
     nltk.data.find('corpora/wordnet')
 except LookupError:
     nltk.download('wordnet')
 
 try:
+    print("Controllo e download supporto Wordet multilingua")
     nltk.data.find('corpora/omw-1.4')
 except LookupError:
     nltk.download('omw-1.4')
 
+print("Dowload corpus semcor")
 nltk.download('semcor')
 
 
