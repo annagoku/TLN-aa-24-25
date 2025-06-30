@@ -35,8 +35,9 @@ if __name__ == "__main__":
     pd.set_option('display.max_columns', None)
 
     # Mostra le prime 5 righe del nuovo DataFrame
-    print("Sampled 10,000 records:")
-    print(df_sampled.head())
+    #print("Sampled 10,000 records:")
+    #print(df_sampled.head())
+    print("Campionamento frasi da corpus.....")
 
     #estrae dagli elementi campionati solo la headline e crea un lista
     sampled_sentece=df_sampled['headline'].tolist() 
