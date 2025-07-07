@@ -10,9 +10,11 @@ from rich.table import Table
 import util as u
 import LeskAlgorithm as la
 
+
 def populate_results_table(terms, N_WORDS):
-    # Crea l'oggetto Console (per stampare nella console)
-    console = Console()
+    # Crea l'oggetto Console con registrazione attiva per l'export
+    console = Console(record=True)
+
 
     # Crea una tabella con il titolo
     table = Table(title="Risultati Disambiguazione", caption="Comparazione tra 'Defined_LESK' e 'nltk_LESK'")
@@ -74,5 +76,6 @@ def populate_results_table(terms, N_WORDS):
 
     # Stampa la tabella
     console.print(table)
+
 
     return code_correct_wsd, ntlk_correct_wds

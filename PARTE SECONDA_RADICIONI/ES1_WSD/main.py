@@ -23,7 +23,7 @@ print("Dowload corpus semcor")
 nltk.download('semcor')
 
 
-N_WORDS = 5
+N_WORDS = 50
 N_ATTEMPTS = 10
 
 mean_accuracy_LESK_CODED = []
