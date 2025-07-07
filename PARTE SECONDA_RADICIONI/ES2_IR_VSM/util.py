@@ -11,6 +11,7 @@ import numpy as np
 
 console = Console()
 
+#Partendo dal file crea un set di stop words
 def set_stop_words():
     with open("stop_words_FULL.txt", "r") as f:
         return set([row.strip() for row in f])
@@ -18,7 +19,7 @@ def set_stop_words():
 
 
 def extraction_lemmi_from_sentence(sentence):
-    # Tokenizzazione
+    # Tokenizzazione - suddivisione di una frase in token (parole, numeri, punteggiatura)
     tokens = word_tokenize(sentence)
     # Lowercase
     tokens_lower = [t.lower() for t in tokens]
@@ -31,22 +32,24 @@ def extraction_lemmi_from_sentence(sentence):
     # Restituisci una stringa (lemmi separati da spazi)
     return " ".join(lemmatized)
 
+#vectorizer.fit prende in ingresso una lista di stringhe
 def pipeline_vectorize_training (sentences, vectorizer):
     pre_processed_sentence=[extraction_lemmi_from_sentence(s) for s in sentences ]
-    X_tfidf = vectorizer.fit_transform(pre_processed_sentence) #fit_transform funzione da usare per i dati di training
+    X_tfidf = vectorizer.fit_transform(pre_processed_sentence) #fit_transform funzione da usare per i dati di partenza
     return X_tfidf
+
 
 def pipeline_retrieval (queries, vectorizer):
     pre_processed_queries=[extraction_lemmi_from_sentence(q) for q in queries ]
-    query_vector = vectorizer.transform(pre_processed_queries)
-    return query_vector
+    query_matrix = vectorizer.transform(pre_processed_queries)
+    return query_matrix
 
-def search_and_display_queries(query_vector, queries, X_tfidf, df_sampled, TOP_N):
+def search_and_display_queries(query_matrix, queries, X_tfidf, df_sampled, TOP_N):
     for q_idx, query in enumerate(queries):
         print(f"\nTop {TOP_N} risultati per: '{query}'")
 
         # Calcola le similarità per la query corrente
-        similarities = cosine_similarity(query_vector[q_idx], X_tfidf).flatten()
+        similarities = cosine_similarity(query_matrix[q_idx], X_tfidf).flatten()
         top_indices = np.argsort(similarities)[::-1][:TOP_N]
 
         # Crea la tabella
