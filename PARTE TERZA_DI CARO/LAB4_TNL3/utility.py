@@ -12,6 +12,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import matplotlib.pyplot as plt
 import gensim.downloader as api
+
 import spacy
 from datasets import load_dataset
 

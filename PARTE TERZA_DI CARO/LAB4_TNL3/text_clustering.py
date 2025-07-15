@@ -30,19 +30,23 @@ def group_embeddings(reduced_embeddings):
     print(len(set(clusters)))
     return clusters
 
-def print_sample_abstracts_from_cluster( clusters, data_dict, cluster_id=0, max_samples=3):
-    # Estrai gli indici degli abstract che appartengono al cluster selezionato
-    indices = np.where(clusters == cluster_id)[0]
+def print_abstracts_from_all_clusters(clusters, data_dict):
+    import numpy as np
 
-    print(f"\nCluster {cluster_id} — {len(indices)} abstract trovati\n")
+    unique_clusters = np.unique(clusters)
 
-    for i in indices[:max_samples]:
-        title = data_dict[i].get("title", "No title")
-        abstract = data_dict[i].get("abstract_lemmatized", "")[:300]  # primi 300 caratteri
-        print(f"📄 {title}\n📝 {abstract}...\n")
+    for cluster_id in sorted(unique_clusters):
+        indices = np.where(clusters == cluster_id)[0]
+
+        print(f"\n=== 📊 Cluster {cluster_id} — {len(indices)} abstract trovati ===\n")
+
+        for i in indices:
+            title = data_dict[i].get("title", "No title")
+            abstract = data_dict[i].get("abstract_lemmatized", "")[:300]  # primi 300 caratteri
+            print(f"📄 {title}\n📝 {abstract}...\n")
 
 
-def plot_umap_clusters(reduced_embeddings, clusters, embeddings, titles=None, sample_size=1000):
+def plot_umap_clusters(clusters, embeddings, titles=None, sample_size=10):
     """
     Visualizza i cluster in uno scatter plot UMAP.
     

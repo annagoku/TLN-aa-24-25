@@ -13,6 +13,6 @@ if __name__ == "__main__":
     print("Cluster creation")
     clusters=tc.group_embeddings(reduced_embeddings)
     print("Print results and graph")
-    tc.print_sample_abstracts_from_cluster(clusters, u.data_dict)
-    tc.plot_umap_clusters(reduced_embeddings, clusters, embeddings)
+    tc.print_abstracts_from_all_clusters(clusters, u.data_dict)
+    tc.plot_umap_clusters(clusters, embeddings)
 
