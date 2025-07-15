@@ -12,30 +12,86 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import matplotlib.pyplot as plt
 import gensim.downloader as api
+from deep_translator import GoogleTranslator
 
+sigla_map = {
+    "CS": {"concretezza": "concreto", "specificità": "specifico"},
+    "CG": {"concretezza": "concreto", "specificità": "generico"},
+    "AS": {"concretezza": "astratto", "specificità": "specifico"},
+    "AG": {"concretezza": "astratto", "specificità": "generico"}
+}
+
+category_metadata={}
+
+
+
+
+
+'''''
 category_metadata = {
-    "Animal": {
+    "Trousers": {
         "concretezza": "concreto",
         "specificità": "generico"
     },
-    "Bicycle": {
+    "Microscope": {
         "concretezza": "concreto",
         "specificità": "specifico"
     },
-    "Justice": {
+    "Heuristic": {
         "concretezza": "astratto",
         "specificità": "specifico"
     },
-    "Emotion": {
+    "Danger": {
         "concretezza": "astratto",
         "specificità": "generico"
     }
 }
+'''
 
 
-FILE='definizioni_full.csv'
+
+def translate_it_to_en(text):
+    try:
+        #print(text)
+        text_translated=GoogleTranslator(source='it', target='en').translate(text)
+        #print(text_translated)
+        return text_translated
+    except Exception as e:
+        print(f"Errore nella traduzione: {e}")
+        return text
+
+
+
+FILE='dataset_definizioni_TLN_25.csv'
 N_TERMS=4
 #N_DEFINITIONS = 32
+
+def load_category_metadata_from_csv(FILE, max_rows=4):
+    global category_metadata 
+
+    with open(FILE, newline='', encoding='utf-8') as f:
+        reader = csv.reader(f, delimiter=';')  # o ',' a seconda del file
+        next(reader)  # Salta intestazione
+        count = 0
+        for row in reader:
+            if count >= max_rows:
+                break
+            if len(row) < 2:
+                continue  # salta righe incomplete
+
+            sigla =row[0].strip()
+            categoria = translate_it_to_en(row[1].strip())
+
+            if sigla in sigla_map:
+                category_metadata[categoria] = sigla_map[sigla]
+            else:
+                # Default o gestione errori
+                category_metadata[categoria] = {"concretezza": "N/A", "specificità": "N/A"}
+
+            count += 1
+    print(category_metadata)
+    return category_metadata
+
 
 ###########Funzioni di pre-processsing#########################################
 
@@ -50,8 +106,10 @@ def set_stop_words():
 
     
 def extraction_lemmi_from_sentence(sentence):
+    #Traduzione in inglese
+    sentence_en=translate_it_to_en(sentence)
     # Tokenizzazione
-    tokens = word_tokenize(sentence)
+    tokens = word_tokenize(sentence_en)
     # Lowercase
     tokens_lower = [t.lower() for t in tokens]
     # Rimuovi stopword
@@ -65,15 +123,17 @@ def extraction_lemmi_from_sentence(sentence):
 
 
 def create_dictionary():
-    global N_TERMS
+    global N_TERMS, category_metadata
     definizioni_dict = {}
+
+    category_metadata=load_category_metadata_from_csv(FILE)
     with open(FILE, "r", encoding='utf-8') as file:
         csv_reader=csv.reader(file,delimiter=";")
         next(csv_reader) #per skippare la prima riga dell'header   
         for row in csv_reader:
             if N_TERMS > 0:
-                concetto=row[0]
-                definizioni=row[1:]
+                concetto=translate_it_to_en(row[1])
+                definizioni=row[2:]
                 if concetto not in definizioni_dict:
                     definizioni_dict[concetto] = []
                 for definizione in definizioni:
@@ -129,6 +189,7 @@ def plot_similarity_summary(simlex_dict, simsem_dict, category_metadata):
         simsem_dict (dict): {categoria: {"media_similarità": float, ...}}
         category_metadata (dict): metadati per ogni categoria (concretezza, specificità)
     """
+    
 
     # Etichette per righe e colonne
     rows = ["Generico", "Specifico"]
