@@ -17,8 +17,9 @@ def BERTTopic_modeling (model, umap_model, hdbscan_model, abstracts, embeddings)
     umap_model = umap_model,
     hdbscan_model = hdbscan_model,
     verbose=True).fit(abstracts, embeddings)
-    topic_model.get_topic_info()
-    topic_model.get_topic(4)
+    info=topic_model.get_topic_info()
+    print(info)
+    #topic_model.get_topic(4)
     return topic_model
 
 def diagnose_topics(topics):

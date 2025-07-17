@@ -32,6 +32,7 @@ def group_embeddings(reduced_embeddings):
     print(len(set(clusters)))
     return clusters, hdbscan_model
 
+'''
 def print_abstracts_from_all_clusters(clusters, data_dict):
    
 
@@ -46,6 +47,24 @@ def print_abstracts_from_all_clusters(clusters, data_dict):
             title = data_dict[i].get("title", "No title")
             abstract = data_dict[i].get("abstract_lemmatized", "")[:300]  # primi 300 caratteri
             #print(f"📄 {title}\n📝 {abstract}...\n")
+'''
+
+def print_abstracts_from_all_clusters(clusters, data_dict):
+    data_list = list(data_dict.values())
+    unique_clusters = np.unique(clusters)
+
+    for cluster_id in sorted(unique_clusters):
+        indices = np.where(clusters == cluster_id)[0]
+
+        # Stampo prima la riga del cluster
+        print(f"\n=== 📊 Cluster {cluster_id} — {len(indices)} abstract trovati ===\n")
+
+        # Poi stampo i titoli
+        for i in indices:
+            title = data_list[i].get("title", "No title")
+            print(f"📄 {title}")
+
+
 
 
 def plot_umap_clusters(clusters, embeddings, titles=None, sample_size=u.NUM_ARTICLE):
