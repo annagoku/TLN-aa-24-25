@@ -16,6 +16,7 @@ import gensim.downloader as api
 import spacy
 from datasets import load_dataset
 
+NUM_ARTICLE=10000
 
 # Carica il modello linguistico
 nlp = spacy.load("en_core_web_sm")
@@ -58,11 +59,11 @@ def data_dict_creation():
             "categories": categories
         }
 
-        if i >= 10000:
+        if i >= NUM_ARTICLE-1:
             break
 
     print(f"Articoli estratti: {len(data_dict)}")
-    print(data_dict[0])
+    #print(data_dict[0])
 
 
 def extraction_lemmi_from_sentence(sentence, stop_words):

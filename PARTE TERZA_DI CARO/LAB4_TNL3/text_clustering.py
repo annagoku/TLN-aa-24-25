@@ -5,7 +5,9 @@ from hdbscan import HDBSCAN
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import utility as u
 
+reduced_embeddings_2D=[]
 
 def embeddings_creation(data_dict):
     # Estrai gli abstract lemmatizzati dal dizionario
@@ -17,21 +19,21 @@ def embeddings_creation(data_dict):
     # Calcola gli embedding
     embeddings = model.encode(abstracts, show_progress_bar=True)
 
-    return embeddings  # embeddings è un array numpy 
+    return embeddings, model  # embeddings è un array numpy 
 
 def dim_reduce(embeddings):
     umap_model = UMAP(n_components=5, min_dist=0.0, metric="cosine", random_state=42)
     reduced_embeddings = umap_model.fit_transform(embeddings)
-    return reduced_embeddings
+    return reduced_embeddings, umap_model
 
 def group_embeddings(reduced_embeddings):
     hdbscan_model = HDBSCAN(min_cluster_size=50, metric="euclidean", cluster_selection_method="eom").fit(reduced_embeddings)
     clusters = hdbscan_model.labels_
     print(len(set(clusters)))
-    return clusters
+    return clusters, hdbscan_model
 
 def print_abstracts_from_all_clusters(clusters, data_dict):
-    import numpy as np
+   
 
     unique_clusters = np.unique(clusters)
 
@@ -43,10 +45,10 @@ def print_abstracts_from_all_clusters(clusters, data_dict):
         for i in indices:
             title = data_dict[i].get("title", "No title")
             abstract = data_dict[i].get("abstract_lemmatized", "")[:300]  # primi 300 caratteri
-            print(f"📄 {title}\n📝 {abstract}...\n")
+            #print(f"📄 {title}\n📝 {abstract}...\n")
 
 
-def plot_umap_clusters(clusters, embeddings, titles=None, sample_size=10):
+def plot_umap_clusters(clusters, embeddings, titles=None, sample_size=u.NUM_ARTICLE):
     """
     Visualizza i cluster in uno scatter plot UMAP.
     
@@ -56,6 +58,8 @@ def plot_umap_clusters(clusters, embeddings, titles=None, sample_size=10):
     - titles: lista opzionale con i titoli degli articoli
     - sample_size: quanti punti visualizzare (default 1000)
     """
+    global reduced_embeddings_2D
+
     reduced_embeddings_2D = UMAP(n_components=2, min_dist=0, metric="cosine", random_state=42).fit_transform(embeddings)
     # Crea il DataFrame UMAP
     df = pd.DataFrame(reduced_embeddings_2D[:sample_size], columns=["x", "y"])
