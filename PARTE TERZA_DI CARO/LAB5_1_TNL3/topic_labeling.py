@@ -1,37 +1,79 @@
 from rich import print
-import time
+import torch
 
 
+def label_all_topics(topic_model, pipe, num_keywords=10, num_docs=3):
+    results = []
 
-def etichetta_topic_interattivo(topic_model, pipe, topic_id, num_keywords=10, num_docs=3):
- 
+    for topic_id in topic_model.get_topics():
+        if topic_id == -1:
+            continue
 
-    # Estrai le keywords del topic
-    topic_keywords = topic_model.get_topic(topic_id)[:num_keywords]
-    keywords = [kw for kw, _ in topic_keywords]
-    
-    # Estrai gli abstracts più rappresentativi
-    topic_docs = topic_model.get_representative_docs()[topic_id][:num_docs]
+        topic_keywords = topic_model.get_topic(topic_id)[:num_keywords]
+        keywords = [kw for kw, _ in topic_keywords]
+        topic_docs = topic_model.get_representative_docs()[topic_id][:num_docs]
 
-    print(f"\n[bold green]Topic {topic_id}[/bold green]")
-    print(f"[bold yellow]Parole chiave:[/bold yellow] {', '.join(keywords)}\n")
-    print("[bold cyan]Abstract rappresentativi:[/bold cyan]")
-    for i, doc in enumerate(topic_docs):
-        print(f"{i+1}. {doc[:200]}...")  # stampa i primi 200 caratteri
+        print(f"\n[Topic {topic_id}]")
+        print(f"🔑 Keywords: {', '.join(keywords)}\n")
 
-    print("\nOra puoi iterare e modificare il prompt finché non sei soddisfatto.\n")
+        print("📄 Representative abstracts:")
+        for i, doc in enumerate(topic_docs):
+            print(f"{i+1}. {doc[:200]}...")
 
-    while True:
-        prompt = input("👉 Inserisci un prompt per generare la label (o 'exit' per uscire):\n> ")
-        if prompt.lower() in {"exit", "esci", "fine"}:
-            break
+        final_label = None
 
-        messages = [
-            {"role": "user", "content": prompt}
-        ]
-        
-        print("\n⏳ Generazione in corso...")
-        output = pipe(messages)
-        label = output[0]["generated_text"].strip()
-        
-        print(f"\n[bold magenta]Etichetta generata:[/bold magenta] {label}\n")
+        while True:
+            prompt = input(
+                "\n📝 Enter a custom prompt to generate the label (or type 'exit' to quit):\n> "
+            ).strip()
+
+            if prompt.lower() == "exit":
+                return results
+
+            if not prompt:
+                print("⚠️ Invalid prompt. Please try again.")
+                continue
+
+            full_prompt = f"{prompt} Keywords: {', '.join(keywords)}"
+            messages = [{"role": "user", "content": full_prompt}]
+
+            print(f"\n📨 Final prompt:\n{full_prompt}")
+            print("⏳ Generating label...")
+
+            try:
+                output = pipe(messages)
+
+                # Gestione robusta del formato dell'output
+                if isinstance(output[0]["generated_text"], str):
+                    full_text = output[0]["generated_text"]
+                elif isinstance(output[0]["generated_text"], list):
+                    # Se è una lista di messaggi (es. con 'role'/'content')
+                    full_text = output[0]["generated_text"][0].get("content", "")
+                else:
+                    raise ValueError("Unexpected output format from pipeline.")
+
+                # Rimozione del prompt iniziale (se incluso nella risposta)
+                if full_text.startswith(full_prompt):
+                    label = full_text[len(full_prompt):].strip()
+                else:
+                    label = full_text.strip()
+
+                print(f"\n🏷️ Generated label: {label}")
+
+                satisfied = input("✅ Are you satisfied with this label? (y/n): ").strip().lower()
+                if satisfied == "y":
+                    final_label = label
+                    break
+                else:
+                    print("🔁 Try again with a new prompt.")
+
+            except Exception as e:
+                print(f"❌ Error during generation: {e}")
+
+        results.append({
+            "topic_id": topic_id,
+            "keywords": keywords,
+            "label": final_label
+        })
+
+    return results
