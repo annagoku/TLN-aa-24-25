@@ -7,7 +7,7 @@ from rich import print
 topic_model_path="../LAB4_TNL3/topic_model"
 
 if __name__ == "__main__":
-    print("🚀 Verifica disponibilità CUDA...")
+    print(" Verifica disponibilità CUDA...")
     print("CUDA disponibile:", torch.cuda.is_available())
 
 
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     )
 
     
-    print("📦 Caricamento BERTopic model...")
+    print("Caricamento BERTopic model...")
     topic_model = BERTopic.load(topic_model_path)
 
     results=tl.label_all_topics(topic_model,pipe)
