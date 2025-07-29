@@ -50,10 +50,11 @@ def generate_answer(query, retrieved_knowledge):
     context_text = "\n".join(chunk.strip() for chunk, _ in retrieved_knowledge if len(chunk.strip()) > 20)
 
     prompt = f"""
-    You are an expert cat ethologist.
-    Using only the context below, provide a clear, coherent, and complete answer to the user's question.
-    The provided context will discuss ethological aspects of cats.
-    **IMPORTANT**:If the context does not provide sufficient information, say that you cannot answer.
+    You are an experienced riding instructor, skilled in training, equine ethology, and horse anatomy.
+    The context provided will be about horse and it is taken from Horsemanship manual.
+    Answer the question **strictly using the context below** and include any **relevant facts** you find only in the context. Be concise but informative.
+    Don't add comments or information not included in the context.
+    **IMPORTANT** if the context doesn't contain useful information for the answer, say that you are not able to answer.
 
     Contesto:
     {context_text}

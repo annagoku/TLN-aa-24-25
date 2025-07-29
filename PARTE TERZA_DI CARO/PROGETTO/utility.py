@@ -10,14 +10,15 @@ MODEL_NAME = "sentence-transformers/paraphrase-MiniLM-L6-v2"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 model = AutoModel.from_pretrained(MODEL_NAME)
 
-def load_dataset(file_path, chunk_size=300):
+def load_dataset(file_path, chunk_size=300, overlap=50):
     """
     Carica il file di testo e lo suddivide in blocchi.
     """
     with open(file_path, "r", encoding="utf-8") as f:
         text = f.read()
     # Split basato su lunghezza
-    chunks = [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
+    step = chunk_size - overlap
+    chunks = [text[i:i+chunk_size] for i in range(0, len(text), step)]
     return chunks
 
 def embed_chunk(chunk):

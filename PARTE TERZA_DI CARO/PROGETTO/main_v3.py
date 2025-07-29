@@ -1,12 +1,12 @@
 from retrieve import load_or_create_index, retrieve, generate_answer
 
 # Percorso del file sorgente
-FILE_PATH = "cat-facts.txt"
+FILE_PATH = "Horse guide.txt"
 
 # Inizializzazione
 text_db, faiss_index = load_or_create_index(FILE_PATH)
 
-print("Benvenuto nel Chatbot Etologo dei Gatti!")
+print("Benvenuto nel Chatbot della Federazione Italiana Sport Equestri!")
 print("Digita 'exit' per terminare.\n")
 
 # Ciclo principale
