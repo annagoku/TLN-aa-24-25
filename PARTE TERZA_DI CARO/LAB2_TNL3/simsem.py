@@ -26,14 +26,14 @@ def get_sentence_embedding(sentence, model):
     else:
         return np.zeros(model.vector_size)
 
-def compute_simsem_for_category(definizioni_dict, model):
+def compute_simsem_for_concept(definizioni_dict, model):
     """
     Calcola la similarità semantica media e la matrice di similarità per ogni categoria
     nel dizionario di definizioni.
 
     Parametri:
         definizioni_dict (dict): dizionario con chiave = categoria, valore = lista di definizioni (lemmatizzate)
-        model: modello Word2Vec o GloVe
+        model: modello Word2Vec 
 
      Ritorna:
         dict: {categoria: {"media_similarità": float, "matrice_similarità": np.array,

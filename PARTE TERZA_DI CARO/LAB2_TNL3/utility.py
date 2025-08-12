@@ -13,6 +13,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import gensim.downloader as api
 from deep_translator import GoogleTranslator
+import os
+import spacy
+
+# Carica il modello linguistico
+nlp = spacy.load("en_core_web_sm")
 
 sigla_map = {
     "CS": {"concretezza": "concreto", "specificità": "specifico"},
@@ -22,32 +27,22 @@ sigla_map = {
 }
 
 category_metadata={}
+FILE=None
+N_TERMS=4
 
+def convert_xlsx_to_csv_if_not_exists(xlsx_path, sheet_name=0):
+    # Costruisce il nome del file CSV a partire dal nome dell'XLSX
+    csv_path = os.path.splitext(xlsx_path)[0] + ".csv"
 
-
-
-
-'''''
-category_metadata = {
-    "Trousers": {
-        "concretezza": "concreto",
-        "specificità": "generico"
-    },
-    "Microscope": {
-        "concretezza": "concreto",
-        "specificità": "specifico"
-    },
-    "Heuristic": {
-        "concretezza": "astratto",
-        "specificità": "specifico"
-    },
-    "Danger": {
-        "concretezza": "astratto",
-        "specificità": "generico"
-    }
-}
-'''
-
+    if os.path.exists(csv_path):
+        print(f"Il file CSV esiste già: {csv_path}")
+    else:
+        # Legge il file Excel (puoi specificare il nome del foglio con sheet_name)
+        df = pd.read_excel(xlsx_path, sheet_name=sheet_name)
+        # Salva come CSV
+        df.to_csv(csv_path, index=False, sep=";")
+        print(f"File CSV creato: {csv_path}")
+    return csv_path
 
 
 def translate_it_to_en(text):
@@ -60,11 +55,6 @@ def translate_it_to_en(text):
         print(f"Errore nella traduzione: {e}")
         return text
 
-
-
-FILE='dataset_definizioni_TLN_25.csv'
-N_TERMS=4
-#N_DEFINITIONS = 32
 
 def load_category_metadata_from_csv(FILE, max_rows=4):
     global category_metadata 
@@ -96,13 +86,17 @@ def load_category_metadata_from_csv(FILE, max_rows=4):
 ###########Funzioni di pre-processsing#########################################
 
 # Carica il modello pre-addestrato (es: Google News)
-def load_word2vec_model(path='GoogleNews-vectors-negative300.bin'):
+def load_Glove_model(path='GoogleNews-vectors-negative300.bin'):
     model=api.load("glove-wiki-gigaword-100")
     return model
 
 def set_stop_words():
     with open("stop_words_FULL.txt", "r") as f:
         return set([row.strip() for row in f])
+    
+def lemmatize_spacy(text):
+    doc = nlp(text)
+    return [token.lemma_ for token in doc if token.is_alpha]
 
     
 def extraction_lemmi_from_sentence(sentence):
@@ -116,16 +110,18 @@ def extraction_lemmi_from_sentence(sentence):
     tokens_no_stop = [t for t in tokens_lower if t not in set_stop_words()]
     # Rimuovi punteggiatura/numeri
     tokens_only_letters = [re.sub(r'[^a-z]', '', t) for t in tokens_no_stop if re.sub(r'[^a-z]', '', t)]
-    # Lemmatizzazione
-    lemmatized = [wn.morphy(t) if wn.morphy(t) else t for t in tokens_only_letters]
+    # Ricostruisci frase pulita
+    cleaned_text = " ".join(tokens_only_letters)
+    # Lemmatizzazione con spaCy
+    lemmatized = lemmatize_spacy(cleaned_text)
     # Restituisci una stringa (lemmi separati da spazi)
     return " ".join(lemmatized)
 
 
 def create_dictionary():
-    global N_TERMS, category_metadata
+    global N_TERMS, category_metadata, FILE
     definizioni_dict = {}
-
+    FILE=convert_xlsx_to_csv_if_not_exists("dataset_definizioni_TLN_25.xlsx")
     category_metadata=load_category_metadata_from_csv(FILE)
     with open(FILE, "r", encoding='utf-8') as file:
         csv_reader=csv.reader(file,delimiter=";")
@@ -142,7 +138,9 @@ def create_dictionary():
                 N_TERMS-=1
     return definizioni_dict
 
-def plot_similarity_matrix(matrix, category_name, similarity_type="semantic"):
+###########Funzione di plot risultati#########################################
+
+def plot_similarity_matrix(matrix, category_name, tipo_concretezza, tipo_specificità, similarity_type="semantic"):
     """
     Visualizza la matrice di similarità tra definizioni per una categoria.
 
@@ -156,10 +154,9 @@ def plot_similarity_matrix(matrix, category_name, similarity_type="semantic"):
     labels = [f"Def{i+1}" for i in range(len(matrix))]
     df = pd.DataFrame(matrix, index=labels, columns=labels)
 
-    print(f"\n{similarity_type.capitalize()} Similarity Matrix for category: {category_name}")
+    print(f"\n{similarity_type.capitalize()} Similarity Matrix for category: {category_name} concetto {tipo_specificità}-{tipo_concretezza}")
     print(df.round(2))
 
-    plt.figure(figsize=(10, 8))
     cmap = 'Blues' if similarity_type == "semantic" else 'Oranges'
 
     plt.imshow(matrix, cmap=cmap, interpolation='nearest')
@@ -167,13 +164,13 @@ def plot_similarity_matrix(matrix, category_name, similarity_type="semantic"):
 
     plt.xticks(ticks=np.arange(len(labels)), labels=labels, rotation=90)
     plt.yticks(ticks=np.arange(len(labels)), labels=labels)
-
+    '''''
     for i in range(len(matrix)):
         for j in range(len(matrix)):
             val = matrix[i, j]
             plt.text(j, i, f"{val:.2f}", ha='center', va='center', color='black', fontsize=8)
-
-    plt.title(f"{similarity_type.capitalize()} Similarity Matrix - {category_name}")
+    '''
+    plt.title(f"{similarity_type.capitalize()} Similarity Matrix - {category_name} concetto {tipo_specificità}-{tipo_concretezza}")
     plt.tight_layout()
     plt.show()
 
@@ -232,7 +229,7 @@ def plot_similarity_summary(simlex_dict, simsem_dict, category_metadata):
     table.set_fontsize(12)
 
     ax.axis('off')
-    plt.title("Media Similarità Lessicale (SimLex) e Semantica (SimSem)", fontsize=14, weight='bold')
+    plt.title("Similarità Lessicale (SimLex) e Semantica (SimSem) Media", fontsize=14, weight='bold')
     plt.tight_layout()
     plt.show()
 
@@ -256,6 +253,9 @@ def aggrega_per_dimensione(sim_dict):
             "specificità": {"generico": float, "specifico": float}
         }
     """
+
+   #struttura dati che contiene quattro liste vuote: due per la dimensione concretezza (concreto e astratto) e due per la dimensione specificità (generico e specifico).
+   # Le liste raccolgono i valori di similarità appartenenti a ciascuna classe. 
     aggregati = {
         "concretezza": {"concreto": [], "astratto": []},
         "specificità": {"generico": [], "specifico": []}
@@ -298,7 +298,7 @@ def plot_similarity_by_dimension(aggregati, tipo="semantic"):
         tipo (str): "semantic" o "lexical" (usato nel titolo)
     """
     tipo = tipo.lower()
-    titolo_base = "Similitudine Semantica" if tipo == "semantic" else "Similitudine Lessicale"
+    titolo_base = "Similarità Semantica (SimSem)" if tipo == "semantic" else "Similarità Lessicale (SimLex)"
 
     # Dati per concretezza
     concretezza_labels = ["concreto", "astratto"]

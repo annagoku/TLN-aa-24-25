@@ -38,7 +38,7 @@ documents = SimpleDirectoryReader(input_dir="data").load_data()
 
 # 2. Configura LLM + embedding (solo Ollama)
 print("Configura i modelli di embedding e generazione")
-Settings.llm = Ollama(model="mistral:7b-instruct-q4_0", request_timeout=120)
+Settings.llm = Ollama(model="mistral:7b-instruct-q4_0", request_timeout=270)
 Settings.embed_model = OllamaEmbedding(model_name="all-minilm")
 
 

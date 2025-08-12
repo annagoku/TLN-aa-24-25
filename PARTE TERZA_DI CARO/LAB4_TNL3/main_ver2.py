@@ -6,6 +6,7 @@ from bertopic import BERTopic
 import utility as u
 import text_clustering as tc
 import topic_modeling as tm
+import  torch
 
 def save_pickle(obj, path):
     with open(path, "wb") as f:
@@ -16,6 +17,8 @@ def load_pickle(path):
         return pickle.load(f)
 
 if __name__ == "__main__":
+    print("🚀 Verifica disponibilità CUDA...")
+    print("CUDA disponibile:", torch.cuda.is_available())
 
     print("\033[32mData dictionary creation\033[0m")
     if not os.path.exists("data_dict.json"):

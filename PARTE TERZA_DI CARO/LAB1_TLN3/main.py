@@ -14,20 +14,36 @@ import graphUtility as gu
 #Caricamento WordNet
 nltk.download('wordnet')
 nltk.download('omw-1.4')
-# Caricamento modello Word2Vec (esempio con GoogleNews)
-#model = KeyedVectors.load_word2vec_format("GoogleNews-vectors-negative300.bin.gz", binary=True)
-#model = api.load("word2vec-google-news-300")
+#Modello di embeddings
 model = api.load("glove-wiki-gigaword-100")
 
-words = ['dog', 'cat', 'car', 'vehicle', 'apple', 'fruit']
+words = [
+    # 1. Sinonimi/quasi sinonimi
+    'big', 'large', 'huge',
+
+    # 2. Concetti ambigui/polisemici
+    'bank', 'money', 'river',
+
+    # 3. Relazioni gerarchiche (iponimo–iperonimo)
+    'dog', 'animal', 'cat',
+
+    # 4. Associazioni funzionali (contesto d’uso)
+    'car', 'road', 'driver',
+
+    # 5. Concetti astratti vs concreti
+    'freedom', 'justice', 'table',
+
+    # 6. Categorie semantiche (gruppo coeso)
+    'apple', 'banana', 'grape'
+]
 
 
 if __name__ == "__main__":
     matrixWordNet = ws.build_wn_similarity_matrix(words)
-    print(np.round(matrixWordNet, 2))
+    print("Matrice di similarità WordNet", np.round(matrixWordNet, 2))
 
     matrixWord2Vec=wts.build_w2v_similarity_matrix(words, model)
-    print(np.round(matrixWordNet, 2))
+    print("Matrice di similarità Word2Vec", np.round(matrixWord2Vec, 2))
 
     gu.compare_similarity_matrices(words, matrixWordNet, matrixWord2Vec)
     gu.compare_similarity_matrices_with_diff (words, matrixWordNet, matrixWord2Vec)

@@ -17,7 +17,7 @@ nltk.download('omw-1.4')
 
 if __name__ == "__main__":
 
-#Creazione di un dizionario categoria - lista definizioni lemmatizzate
+#Creazione di un dizionario categoria - definizioni
     definizioni_dict=u.create_dictionary()
     dict_disambiguato=u.process_definizioni(definizioni_dict)
     u.print_rich_table(dict_disambiguato)

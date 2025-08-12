@@ -18,7 +18,7 @@ import utility as u
 
 
 
-def compute_simlex_for_category(definizioni_dict):
+def compute_simlex_for_concept(definizioni_dict):
     """
     Calcola la similarità lessicale per ogni concetto usando l'overlap tra i lemmi delle definizioni.
 
