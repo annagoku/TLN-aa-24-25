@@ -25,8 +25,7 @@ from gensim.models import KeyedVectors
 nlp = spacy.load("en_core_web_sm")
 
 
-# Carica il modello per embeddings (modello leggero e performante)
-#model = SentenceTransformer('all-MiniLM-L12-v2')
+# Carica il modello per W2v
 w2v_model = KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
 
 
@@ -211,52 +210,6 @@ def extract_genus_and_differentia_dependency(definizione):
     differentia = " ".join(differentia_tokens)
 
     return genus, differentia
-
-
-'''''
-def score_against_definition(synset, definizione):
-    # Testo synset: definizione + esempi, non lemmatizzato
-    synset_text = synset.definition()
-    if synset.examples():
-        synset_text += " " + " ".join(synset.examples())
-
-    # Testo definizione: lemmatizzato
-    definizione_lemmi = extraction_lemmi_from_sentence(definizione)
-
-    # Calcola embeddings
-    embeddings = model.encode([synset_text, definizione_lemmi], convert_to_tensor=True)
-    synset_emb, definizione_emb = embeddings[0], embeddings[1]
-
-    # Calcola cosine similarity
-    cosine_score = util.cos_sim(synset_emb, definizione_emb).item()
-
-    return cosine_score
-'''
-
-'''''
-def score_against_definition_tfidf(synset, definizione):
-    """
-    Calcola la cosine similarity tra una definizione e la glossa di un synset usando TF-IDF.
-    """
-    # Prepara il testo del synset: definizione + esempi
-    synset_text = synset.definition()
-    if synset.examples():
-        synset_text += " " + " ".join(synset.examples())
-    synset_text_lemma=extraction_lemmi_from_sentence(synset_text)
-    definizione_lemma=extraction_lemmi_from_sentence(definizione)
-
-    # Lista dei testi da trasformare
-    testi = [definizione_lemma, synset_text_lemma]
-
-    # Crea TF-IDF vectorizer e calcola i vettori
-    vectorizer = TfidfVectorizer()
-    tfidf_matrix = vectorizer.fit_transform(testi)
-
-    # Cosine similarity tra definizione e synset
-    cosine_score = cosine_similarity(tfidf_matrix[0], tfidf_matrix[1])[0][0]
-
-    return cosine_score
-'''
 
 def score_against_definition_word2vec(synset, definizione, w2v_model):
     """

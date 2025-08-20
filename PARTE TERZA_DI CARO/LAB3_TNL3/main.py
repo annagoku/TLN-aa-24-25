@@ -11,8 +11,6 @@ from gensim.models import KeyedVectors
 import os
 import torch
 
-#print(os.getcwd())
-
 if torch.cuda.is_available():
     print("GPU disponibile:", torch.cuda.get_device_name(0))
 else:
