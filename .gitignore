@@ -1,2 +1,4 @@
 *__pycache__*
 */topic_model
+*.bin
+*/chroma.sqlite3

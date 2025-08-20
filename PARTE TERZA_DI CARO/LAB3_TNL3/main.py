@@ -8,8 +8,15 @@ from collections import Counter
 from nltk.corpus import wordnet as wn
 import utility as u
 from gensim.models import KeyedVectors
+import os
+import torch
 
+#print(os.getcwd())
 
+if torch.cuda.is_available():
+    print("GPU disponibile:", torch.cuda.get_device_name(0))
+else:
+    print("GPU non disponibile, si usa la CPU")
 
 
 nltk.download('wordnet')
