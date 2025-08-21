@@ -5,7 +5,7 @@ import topic_modeling as tm
 
 if __name__ == "__main__":
 
-    #Caricamento dataset
+    #Caricamento dataset in struttura dati di tipo dizionario
     print("\033[32mData dictionary creation\033[0m")
     u.data_dict_creation()
 
@@ -19,16 +19,14 @@ if __name__ == "__main__":
     print("\033[32mCluster creation\033[0m")
     clusters, hdbscan_model=tc.group_embeddings(reduced_embeddings)
     print("\033[32mPrint results and graph\033[0m")
-    tc.print_abstracts_from_all_clusters(clusters, u.data_dict)
+    #tc.print_abstracts_from_all_clusters(clusters, u.data_dict)
     tc.plot_umap_clusters(clusters, embeddings)
 
     #Pipeline Topic Modeling
-
-    # Estrae gli abstract lemmatizzati
+    # Estrazione degli abstract lemmatizzati
     abstracts = [item["abstract_lemmatized"] for item in u.data_dict.values()]
     print("\033[32mTopic model creation\033[0m")
     topic_model=tm.BERTTopic_modeling(model, umap_model, hdbscan_model, abstracts, embeddings)
-    #titles = [item["title"] for item in u.data_dict.values()]
     print("\033[32mPrint topics\033[0m")
     tm.topic_visualization(topic_model, abstracts, tc.reduced_embeddings_2D)
 

@@ -18,7 +18,6 @@ def embeddings_creation(data_dict):
 
     # Calcola gli embedding
     embeddings = model.encode(abstracts, show_progress_bar=True)
-
     return embeddings, model  # embeddings è un array numpy 
 
 def dim_reduce(embeddings):
@@ -30,42 +29,13 @@ def group_embeddings(reduced_embeddings):
     hdbscan_model = HDBSCAN(min_cluster_size=50, metric="euclidean", cluster_selection_method="eom").fit(reduced_embeddings)
     clusters = hdbscan_model.labels_
     print(len(set(clusters)))
-    return clusters, hdbscan_model
-
-'''
-def print_abstracts_from_all_clusters(clusters, data_dict):
-   
-
     unique_clusters = np.unique(clusters)
 
     for cluster_id in sorted(unique_clusters):
         indices = np.where(clusters == cluster_id)[0]
-
-        print(f"\n=== 📊 Cluster {cluster_id} — {len(indices)} abstract trovati ===\n")
-
-        for i in indices:
-            title = data_dict[i].get("title", "No title")
-            abstract = data_dict[i].get("abstract_lemmatized", "")[:300]  # primi 300 caratteri
-            #print(f"📄 {title}\n📝 {abstract}...\n")
-'''
-
-def print_abstracts_from_all_clusters(clusters, data_dict):
-    data_list = list(data_dict.values())
-    unique_clusters = np.unique(clusters)
-
-    for cluster_id in sorted(unique_clusters):
-        indices = np.where(clusters == cluster_id)[0]
-
         # Stampo prima la riga del cluster
-        print(f"\n=== 📊 Cluster {cluster_id} — {len(indices)} abstract trovati ===\n")
-
-        # Poi stampo i titoli
-        for i in indices:
-            title = data_list[i].get("title", "No title")
-            print(f"📄 {title}")
-
-
-
+        print(f"\n=== Cluster {cluster_id} — {len(indices)} abstract trovati ===\n")
+    return clusters, hdbscan_model
 
 def plot_umap_clusters(clusters, embeddings, titles=None, sample_size=u.NUM_ARTICLE):
     """
@@ -74,22 +44,15 @@ def plot_umap_clusters(clusters, embeddings, titles=None, sample_size=u.NUM_ARTI
     Parameters:
     - reduced_embeddings: ndarray, UMAP embeddings ridotti (es. shape [N, 2])
     - clusters: array/list con etichette di clustering (es. da HDBSCAN)
-    - titles: lista opzionale con i titoli degli articoli
     - sample_size: quanti punti visualizzare (default 1000)
     """
     global reduced_embeddings_2D
-
+    #RIduzione dimensionale a 2 dimensioni per permetterne la rappresentazione su un piano
     reduced_embeddings_2D = UMAP(n_components=2, min_dist=0, metric="cosine", random_state=42).fit_transform(embeddings)
-    # Crea il DataFrame UMAP
+    # Crea il DataFrame UMAP convertendo l'array numpy. I valori x e y sono le due componenti di ciascu array
     df = pd.DataFrame(reduced_embeddings_2D[:sample_size], columns=["x", "y"])
-    
-    if titles:
-        df["title"] = titles[:sample_size]
-    else:
-        df["title"] = [f"Abstract {i}" for i in range(sample_size)]
-
     df["cluster"] = [str(c) for c in clusters[:sample_size]]
-
+    
     # Separazione outlier / cluster validi
     to_plot_df = df[df["cluster"] != "-1"]
     outliers_df = df[df["cluster"] == "-1"]

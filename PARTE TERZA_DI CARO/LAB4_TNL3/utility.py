@@ -16,7 +16,7 @@ import gensim.downloader as api
 import spacy
 from datasets import load_dataset
 
-NUM_ARTICLE=10000
+NUM_ARTICLE=40000
 
 # Carica il modello linguistico
 nlp = spacy.load("en_core_web_sm")
@@ -34,7 +34,7 @@ def set_stop_words():
         return set([row.strip() for row in f])
 
 # Controlla le colonne disponibili
-print(dataset.column_names)
+print("Attributi colonnari degli articoli: ", dataset.column_names)
 
 # Estrai titolo, abstract e categorie in un dizionario
 # Usa 'id' o un contatore numerico come chiave
