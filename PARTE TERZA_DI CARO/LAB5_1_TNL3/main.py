@@ -1,58 +1,38 @@
-import os
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from bertopic import BERTopic
 import topic_labeling as tl
+import topic_modeling_lab5 as tm
 from rich import print
+import os
+
+topic_model_path="topic_model"
 
 if __name__ == "__main__":
-    print("🚀 Verifica disponibilità CUDA...")
+    print(" Verifica disponibilità CUDA...")
     print("CUDA disponibile:", torch.cuda.is_available())
 
-    tokenizer_path = "./my_llm_tokenizer"
-    topic_model_path="../LAB4_TNL3/topic_model"
-
-
-    
-    # Caricamento modello direttamente, senza salvarlo
-    print("🔧 Caricamento modello LLM...")
-    model = AutoModelForCausalLM.from_pretrained(
-        "microsoft/Phi-3.5-mini-instruct",
-        device_map="auto",
-        torch_dtype="auto",
-        trust_remote_code=False
-    )
-  
-
-    # Caricamento tokenizer
-    if os.path.exists(tokenizer_path):
-        print("✅ Caricamento tokenizer da disco...")
-        tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
+#Recupero topic model sulla base del dataset del laboratorio 4
+    if os.path.exists(topic_model_path):
+       print("Caricamento topic model già esistente...")
+       topic_model = BERTopic.load(topic_model_path)
+       
     else:
-        print("⬇️ Scaricamento tokenizer...")
-        tokenizer = AutoTokenizer.from_pretrained(
-            "microsoft/Phi-3.5-mini-instruct",
-            trust_remote_code=True
-        )
-        tokenizer.save_pretrained(tokenizer_path)
-        print("💾 Tokenizer salvato.")
+       print("Creazione di un nuovo topic model...")
+       topic_model=tm.topic_modeling_creation()
+       print("Salvataggio del topic model...")
+       topic_model.save(topic_model_path)
 
+    print("Caricamento del model")
+    model = tl.model_creation()
 
-    # Creazione della pipeline di generazione
-    pipe = pipeline(
-        "text-generation",
-        model=model,
-        tokenizer=tokenizer,
-        max_new_tokens=300
-    )
+    print("Caricamento del tokenizer")
+    tokenizer = tl.tokenizer_creation()
 
-    # Caricamento del modello di topic
-    print("📦 Caricamento BERTopic model...")
-    topic_model = BERTopic.load(topic_model_path)
+    print("Creazione della pipe")
+    pipe =tl.pipe_creation(model, tokenizer)
 
-
-    # Iterazione sui topic per assegnare etichette
-    for topic_id in topic_model.get_topics().keys():
-        if topic_id == -1:
-            continue  # salta il topic -1 (outlier)
-        tl.etichetta_topic_interattivo(topic_model, pipe, topic_id)
+    results=tl.label_all_topics(topic_model,pipe)
+    print(results)
+  
+    
