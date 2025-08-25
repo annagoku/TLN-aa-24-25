@@ -2,3 +2,4 @@
 */topic_model
 *.bin
 */chroma.sqlite3
+*.pkl
