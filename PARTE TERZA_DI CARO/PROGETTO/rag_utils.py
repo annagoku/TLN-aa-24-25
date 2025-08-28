@@ -1,5 +1,3 @@
-# rag_utils.py
-
 from llama_index.core.readers import SimpleDirectoryReader
 from llama_index.core.node_parser import SemanticSplitterNodeParser, SentenceSplitter
 from llama_index.core import VectorStoreIndex, StorageContext
@@ -47,7 +45,7 @@ def configure_models():
 def parse_documents(documents):
     print("Suddivisione in chunk")
     parser = SentenceSplitter(
-        chunk_size=512,
+        chunk_size=400,
         chunk_overlap=50,
         paragraph_separator="\n\n",
         include_metadata=True,
@@ -71,11 +69,43 @@ def build_index(parsed_nodes, vector_store):
     return index
 
 
-def build_query_engine(index, prompt_template, top_k=5):
-    print("Creazione del motore di ricerca")
+# --- RETRIEVAL ---
+def build_retriever(index, top_k=5):
+    """
+    Costruisce la componente di retrieval a partire dall'indice.
+    Restituisce un retriever che recupera i top_k chunk più rilevanti.
+    """
+    print("Creazione del retriever")
     retriever = index.as_retriever(top_k=top_k)
+    return retriever
+
+
+# --- GENERAZIONE ---
+def build_generator(prompt_template, mode="refine"):
+    """
+    Costruisce la componente di generazione (synthesizer).
+    response_mode='refine' permette di generare una prima risposta
+    e raffinarla progressivamente con i chunk successivi.
+    """
+    print("Creazione del generatore di risposte")
     synthesizer = get_response_synthesizer(
-        response_mode="refine",
+        response_mode=mode,
         text_qa_template=prompt_template
     )
-    return RetrieverQueryEngine.from_args(retriever=retriever, response_synthesizer=synthesizer), retriever
+    return synthesizer
+
+# --- QUERY ENGINE (retrieval + generazione) ---
+def build_query_engine(index, prompt_template, top_k=5):
+    """
+    Integra retriever e generator in un unico motore di query.
+    """
+    retriever = build_retriever(index, top_k=top_k)
+    synthesizer = build_generator(prompt_template, mode="refine")
+
+    print("Creazione del motore di ricerca e generazione")
+    query_engine = RetrieverQueryEngine.from_args(
+        retriever=retriever,
+        response_synthesizer=synthesizer
+    )
+    return query_engine, retriever
+
