@@ -26,7 +26,7 @@ if __name__ == "__main__":
     # Estrazione degli abstract lemmatizzati
     abstracts = [item["abstract_lemmatized"] for item in u.data_dict.values()]
     print("\033[32mTopic model creation\033[0m")
-    topic_model=tm.BERTTopic_modeling(model, umap_model, hdbscan_model, abstracts, embeddings)
+    topic_model=tm.BERTopic_modeling(model, umap_model, hdbscan_model, abstracts, embeddings)
     print("\033[32mPrint topics\033[0m")
     tm.topic_visualization(topic_model, abstracts, tc.reduced_embeddings_2D)
 

@@ -11,7 +11,7 @@ import plotly.io as pio
 pio.renderers.default = "browser"   # apre il grafico nel browser
 
 
-def BERTTopic_modeling (model, umap_model, hdbscan_model, abstracts, embeddings):
+def BERTopic_modeling (model, umap_model, hdbscan_model, abstracts, embeddings):
     topic_model = BERTopic(
     embedding_model = model,
     umap_model = umap_model,
