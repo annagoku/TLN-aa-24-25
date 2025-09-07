@@ -85,8 +85,8 @@ def load_category_metadata_from_csv(FILE, max_rows=4):
 
 ###########Funzioni di pre-processsing#########################################
 
-# Carica il modello pre-addestrato (es: Google News)
-def load_Glove_model(path='GoogleNews-vectors-negative300.bin'):
+# Carica il modello Glove
+def load_Glove_model():
     model=api.load("glove-wiki-gigaword-100")
     return model
 
@@ -149,7 +149,7 @@ def plot_similarity_matrix(matrix, category_name, tipo_concretezza, tipo_specifi
         category_name (str): nome della categoria/concept
         similarity_type (str): 'semantic' o 'lexical' (default: 'semantic')
     """
-    assert similarity_type in {"semantic", "lexical"}, "similarity_type deve essere 'semantic' o 'lexical'"
+    assert similarity_type in {"semantic", "lexical"}, "similarity_type deve essere 'semantic' o 'lexical'" #condizione, messaggio di errore
 
     labels = [f"Def{i+1}" for i in range(len(matrix))]
     df = pd.DataFrame(matrix, index=labels, columns=labels)
@@ -164,12 +164,7 @@ def plot_similarity_matrix(matrix, category_name, tipo_concretezza, tipo_specifi
 
     plt.xticks(ticks=np.arange(len(labels)), labels=labels, rotation=90)
     plt.yticks(ticks=np.arange(len(labels)), labels=labels)
-    '''''
-    for i in range(len(matrix)):
-        for j in range(len(matrix)):
-            val = matrix[i, j]
-            plt.text(j, i, f"{val:.2f}", ha='center', va='center', color='black', fontsize=8)
-    '''
+    
     plt.title(f"{similarity_type.capitalize()} Similarity Matrix - {category_name} concetto {tipo_specificità}-{tipo_concretezza}")
     plt.tight_layout()
     plt.show()

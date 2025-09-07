@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
 #Analisi della similarità tramite simsem
     print("Analisi di similarità semantica")
-    model=u.load_word2vec_model()
+    model=u.load_Glove_model()
     risultati_simsem=simsem.compute_simsem_for_concept(definizioni_dict,model)
     for categoria, dati in risultati_simlex.items():
         media = dati["media_similarità"]

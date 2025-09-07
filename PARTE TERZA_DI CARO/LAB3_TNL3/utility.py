@@ -228,7 +228,7 @@ def score_against_definition_word2vec(synset, definizione, w2v_model):
         vecs = [model[word] for word in tokens if word in model]
         if len(vecs) == 0:
             return np.zeros(model.vector_size)
-        return np.mean(vecs, axis=0)
+        return np.mean(vecs, axis=0) #media colonna per colonna
 
     definizione_vec = average_vector(definizione_lemma, w2v_model)
     synset_vec = average_vector(synset_lemma, w2v_model)
@@ -248,7 +248,7 @@ def explore_synset_tree(synset, definizione, depth=0, max_depth=2, visited=None)
     
     visited.add(synset)
     
-    # Calcola punteggio con differentia
+    # Calcola punteggio con definizione
     best_synset = synset
     best_score = score_against_definition_word2vec(synset, definizione,w2v_model)
     
@@ -285,7 +285,7 @@ def process_definizioni(definizioni_dict):
     
     print("Lista synset ammissibili per concetto")
     for concetto in definizioni_dict.keys():
-        # Puoi cercare synset per lemma "concetto" e tutte le POS, oppure solo NOUN se preferisci
+        # Cerca synset per lemma "concetto" e tutte le POS
         synsets = wn.synsets(concetto)  
         concetto_synsets_ammissibili[concetto] = [syn.name() for syn in synsets]
 
@@ -298,7 +298,7 @@ def process_definizioni(definizioni_dict):
             entry["genus"] = genus
             entry["differentia"] = differentia
 
-            # Qui fai la disambiguazione solo se c'è genus
+            #Disambiguazione solo se c'è genus
             if genus:
                 #print("Navigazione ricorsiva iperonimi e iponimi per genus")
                 synset, best_score = find_best_synset_by_genus_and_differentia(genus, definizione)
@@ -310,7 +310,7 @@ def process_definizioni(definizioni_dict):
                 entry["glossa"] = None
                 entry["best_score"] = "no_genus"
 
-            # Aggiungi in ogni entry la lista completa di synset candidati per il concetto
+            #In ogni entry viene aggiunta la lista completa di synset candidati per il concetto
             entry["candidate_synsets_for_concept"] = concetto_synsets_ammissibili.get(concetto, [])
 
     return definizioni_dict

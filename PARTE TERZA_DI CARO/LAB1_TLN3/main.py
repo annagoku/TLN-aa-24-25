@@ -19,7 +19,7 @@ model = api.load("glove-wiki-gigaword-100")
 
 words = [
     # 1. Sinonimi/quasi sinonimi
-    'big', 'large', 'huge',
+    'giant', 'mountain', 'skyscraper',
 
     # 2. Concetti ambigui/polisemici
     'bank', 'money', 'river',
@@ -39,6 +39,7 @@ words = [
 
 
 if __name__ == "__main__":
+   
     matrixWordNet = ws.build_wn_similarity_matrix(words)
     print("Matrice di similarità WordNet", np.round(matrixWordNet, 2))
 
@@ -47,3 +48,4 @@ if __name__ == "__main__":
 
     gu.compare_similarity_matrices(words, matrixWordNet, matrixWord2Vec)
     gu.compare_similarity_matrices_with_diff (words, matrixWordNet, matrixWord2Vec)
+  
