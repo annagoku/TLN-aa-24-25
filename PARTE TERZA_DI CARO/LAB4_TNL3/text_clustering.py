@@ -51,7 +51,7 @@ def plot_umap_clusters(clusters, embeddings, titles=None, sample_size=u.NUM_ARTI
     reduced_embeddings_2D = UMAP(n_components=2, min_dist=0, metric="cosine", random_state=42).fit_transform(embeddings)
     # Crea il DataFrame UMAP convertendo l'array numpy. I valori x e y sono le due componenti di ciascu array
     df = pd.DataFrame(reduced_embeddings_2D[:sample_size], columns=["x", "y"])
-    df["cluster"] = [str(c) for c in clusters[:sample_size]]
+    df["cluster"] = [str(c) for c in clusters[:sample_size]] #aggiunge l'etichetta di cluster
     
     # Separazione outlier / cluster validi
     to_plot_df = df[df["cluster"] != "-1"]

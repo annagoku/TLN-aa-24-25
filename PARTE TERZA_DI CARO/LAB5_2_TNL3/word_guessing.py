@@ -118,7 +118,7 @@ def interactive_guessing(def_dict, pipe, max_per_concept=5):
                     if next_action == "nextdef":
                         def_index += 1
                     elif next_action == "prompt":
-                        continue
+                        continue #ritorna all'inizio del ciclo while senza incrementare l'indice di domanda
 
             except Exception as e:
                 print(f"Error during generation: {e}")

@@ -17,7 +17,7 @@ def get_prompt_template():
         The context provided will be about horse and it is taken from Horsemanship manual.
         Answer the question **strictly using the context below** and include any **relevant facts** you find only in the context. Be concise but informative.
         Don't add comments or information not included in the context.
-        **IMPORTANT** if the context doesn't contain useful information for the answer, say that you are not able to answer."
+        **IMPORTANT** if the context doesn't contain useful information for the answer, say that you are not able to answer.
 
     CONTEXT:
     {context_str}

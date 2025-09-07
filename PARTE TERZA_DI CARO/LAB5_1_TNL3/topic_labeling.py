@@ -6,8 +6,9 @@ import utility as u
 import random
 import pickle
 
+############################ Pipeline di generazione ####################
 
-
+#caricamento del modello LLM
 def model_creation():
     model = AutoModelForCausalLM.from_pretrained(
     "microsoft/Phi-3.5-mini-instruct",
@@ -16,7 +17,7 @@ def model_creation():
     trust_remote_code=False
     )
     return model
-
+#creazione del tokenizer
 def tokenizer_creation():
     tokenizer = AutoTokenizer.from_pretrained(
     "microsoft/Phi-3.5-mini-instruct",
@@ -24,6 +25,7 @@ def tokenizer_creation():
     )
     return tokenizer
 
+#creazione della pipe-- wrapper che unisce modello, tokenizer, logica di generazione
 def pipe_creation(model, tokenizer):
     pipe = pipeline(
     "text-generation",
@@ -31,7 +33,7 @@ def pipe_creation(model, tokenizer):
     max_new_tokens=300,
     tokenizer=tokenizer,
     temperature=0.2,
-    top_p=1
+    top_p=1 #probabilità cumulata sui token da utilizzare per la generazione se 1 tutti i token possibili
     )
     return pipe
 
@@ -121,7 +123,7 @@ def label_all_topics(topic_model, pipe, num_keywords=10, num_docs=3):
                 label = full_text.strip()
                 print(f"\n Generated label: {label}")
 
-                # Aggiungi anche la risposta alla history
+                # Si aggiunge anche la risposta alla history
                 conversation_history.append({"role": "assistant", "content": label})
 
                 satisfied = input(" Are you satisfied with this label? (y/n): ").strip().lower()

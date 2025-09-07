@@ -21,7 +21,7 @@ def embeddings_creation(data_dict):
     abstracts = [item["abstract"] for item in data_dict.values()]
     titles = [item["title"] for item in data_dict.values()]
     # Mapping a 3 vie: lemma -> (original, title)
-    mapping = {lemma: (orig, title) for lemma, orig, title in zip(abstracts_lemmatized, abstracts, titles)}
+    mapping = {lemma: (orig, title) for lemma, orig, title in zip(abstracts_lemmatized, abstracts, titles)}# pickle è nativo python
     with open("mapping.pkl", "wb") as f:
         pickle.dump(mapping, f)
 

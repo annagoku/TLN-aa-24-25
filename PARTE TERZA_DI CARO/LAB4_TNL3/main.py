@@ -19,7 +19,6 @@ if __name__ == "__main__":
     print("\033[32mCluster creation\033[0m")
     clusters, hdbscan_model=tc.group_embeddings(reduced_embeddings)
     print("\033[32mPrint results and graph\033[0m")
-    #tc.print_abstracts_from_all_clusters(clusters, u.data_dict)
     tc.plot_umap_clusters(clusters, embeddings)
 
     #Pipeline Topic Modeling
